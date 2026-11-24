@@ -1,0 +1,3444 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIGEC — Sistema de Gestão de Contratos e Vigências | PMTO</title>
+  <meta name="description" content="Sistema de Gestão de Contratos e Vigências da Polícia Militar do Estado do Tocantins - Gerência de Contratos com Banco de Dados Gratuito Integrado.">
+  <style>
+    /* ==========================================================================
+       SIGEC PMTO - FOLHA DE ESTILOS INSTITUCIONAL (AZUL ESCURO E GRAFITE)
+       ========================================================================== */
+    :root {
+      --pmto-navy-dark: #0A192F;
+      --pmto-navy-primary: #1B365D;
+      --pmto-navy-light: #2A4D7E;
+      --pmto-navy-subtle: #EBF1F8;
+      --pmto-gold: #D97706;
+      --pmto-gold-light: #FDE68A;
+
+      --pmto-slate-900: #0F172A;
+      --pmto-slate-800: #1E293B;
+      --pmto-slate-700: #334155;
+      --pmto-slate-600: #475569;
+      --pmto-slate-500: #64748B;
+      --pmto-slate-400: #94A3B8;
+      --pmto-slate-300: #CBD5E1;
+      --pmto-slate-200: #E2E8F0;
+      --pmto-slate-100: #F1F5F9;
+      --pmto-slate-50: #F8FAFC;
+      --white: #FFFFFF;
+
+      /* Faixas de Alerta */
+      --status-vencido-text: #991B1B;
+      --status-vencido-bg: #FEE2E2;
+      --status-vencido-border: #F87171;
+
+      --status-critico-text: #C2410C;
+      --status-critico-bg: #FFEDD5;
+      --status-critico-border: #FB923C;
+
+      --status-atencao-text: #B45309;
+      --status-atencao-bg: #FEF3C7;
+      --status-atencao-border: #FBBF24;
+
+      --status-monitorar-text: #1D4ED8;
+      --status-monitorar-bg: #DBEAFE;
+      --status-monitorar-border: #60A5FA;
+
+      --status-regular-text: #15803D;
+      --status-regular-bg: #DCFCE7;
+      --status-regular-border: #4ADE80;
+
+      /* Sombras e Bordas */
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-full: 9999px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--pmto-slate-100);
+      color: var(--pmto-slate-800);
+      line-height: 1.5;
+      font-size: 14px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Cabeçalho Institucional */
+    .header-pmto {
+      background: linear-gradient(135deg, var(--pmto-navy-dark) 0%, var(--pmto-navy-primary) 100%);
+      color: var(--white);
+      padding: 16px 28px;
+      border-bottom: 4px solid var(--pmto-gold);
+      box-shadow: var(--shadow-md);
+    }
+
+    .header-container {
+      max-width: 1500px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .pmto-crest-icon {
+      width: 48px;
+      height: 48px;
+      fill: none;
+      stroke: currentColor;
+      flex-shrink: 0;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+
+    .brand-titles h1 {
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-titles h1 span.sigla {
+      color: var(--pmto-gold-light);
+      font-weight: 800;
+    }
+
+    .brand-titles p {
+      font-size: 12.5px;
+      color: var(--pmto-slate-300);
+      font-weight: 400;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Badge de Status do Banco de Dados */
+    .db-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid #10B981;
+      color: #A7F3D0;
+      padding: 7px 14px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .db-status-pill:hover {
+      background: rgba(16, 185, 129, 0.25);
+      border-color: #34D399;
+      transform: translateY(-1px);
+    }
+
+    .db-status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10B981;
+      box-shadow: 0 0 8px #10B981;
+      animation: pulseDot 2s infinite;
+    }
+
+    @keyframes pulseDot {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .header-info-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 7px 14px;
+      border-radius: var(--radius-md);
+      font-size: 12px;
+    }
+
+    .header-info-box svg {
+      width: 16px;
+      height: 16px;
+      stroke: var(--pmto-gold-light);
+    }
+
+    /* Navegação por Abas */
+    .nav-tabs-wrapper {
+      background: var(--white);
+      border-bottom: 1px solid var(--pmto-slate-200);
+      box-shadow: var(--shadow-sm);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-tabs-container {
+      max-width: 1500px;
+      margin: 0 auto;
+      display: flex;
+      gap: 4px;
+      padding: 0 20px;
+      overflow-x: auto;
+    }
+
+    .nav-tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 18px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--pmto-slate-600);
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .nav-tab-btn svg {
+      width: 17px;
+      height: 17px;
+      stroke: currentColor;
+    }
+
+    .nav-tab-btn:hover {
+      color: var(--pmto-navy-primary);
+      background: var(--pmto-slate-50);
+    }
+
+    .nav-tab-btn.active {
+      color: var(--pmto-navy-primary);
+      border-bottom-color: var(--pmto-navy-primary);
+      background: var(--pmto-slate-50);
+    }
+
+    .nav-tab-btn .badge-counter {
+      background: var(--pmto-slate-200);
+      color: var(--pmto-slate-700);
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+    }
+
+    .nav-tab-btn.active .badge-counter {
+      background: var(--pmto-navy-primary);
+      color: var(--white);
+    }
+
+    /* Conteúdo Principal */
+    .main-content {
+      flex: 1;
+      max-width: 1500px;
+      width: 100%;
+      margin: 22px auto;
+      padding: 0 24px;
+    }
+
+    .tab-pane {
+      display: none;
+      animation: fadeIn 0.25s ease-in-out;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cartões de Indicadores (KPIs) */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .kpi-card {
+      background: var(--white);
+      border: 1px solid var(--pmto-slate-200);
+      border-radius: var(--radius-md);
+      padding: 15px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border-top: 4px solid var(--pmto-navy-primary);
+      position: relative;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .kpi-card.kpi-vencidos { border-top-color: var(--status-vencido-border); }
+    .kpi-card.kpi-critico { border-top-color: var(--status-critico-border); }
+    .kpi-card.kpi-atencao { border-top-color: var(--status-atencao-border); }
+    .kpi-card.kpi-monitorar { border-top-color: var(--status-monitorar-border); }
+    .kpi-card.kpi-pendencias { border-top-color: #8B5CF6; }
+
+    .kpi-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .kpi-title {
+      font-size: 11.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--pmto-slate-500);
+    }
+
+    .kpi-icon {
+      width: 20px;
+      height: 20px;
+      stroke: var(--pmto-slate-400);
+    }
+
+    .kpi-value {
+      font-size: 21px;
+      font-weight: 700;
+      color: var(--pmto-slate-900);
+      line-height: 1.2;
+    }
+
+    .kpi-subtext {
+      font-size: 11px;
+      color: var(--pmto-slate-500);
+      margin-top: 4px;
+    }
+
+    /* SEÇÃO DE GRÁFICOS GERENCIAIS DE PROCESSOS */
+    .charts-section {
+      background: var(--white);
+      border: 1px solid var(--pmto-slate-200);
+      border-radius: var(--radius-lg);
+      padding: 20px 22px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 22px;
+    }
+
+    .charts-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--pmto-slate-200);
+      padding-bottom: 12px;
+    }
+
+    .charts-section-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .charts-section-title h3 {
+      font-size: 16.5px;
+      font-weight: 700;
+      color: var(--pmto-navy-primary);
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 18px;
+    }
+
+    .chart-card {
+      background: var(--pmto-slate-50);
+      border: 1px solid var(--pmto-slate-200);
+      border-radius: var(--radius-md);
+      padding: 15px 17px;
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .chart-card:hover {
+      box-shadow: var(--shadow-md);
+      background: var(--white);
+    }
+
+    .chart-card-header {
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--pmto-slate-200);
+      padding-bottom: 7px;
+    }
+
+    .chart-card-title {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--pmto-slate-800);
+    }
+
+    .chart-card-subtitle {
+      display: block;
+      font-size: 11px;
+      color: var(--pmto-slate-500);
+      margin-top: 2px;
+    }
+
+    .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 12px;
+      justify-content: center;
+      margin-top: 12px;
+      width: 100%;
+    }
+
+    .chart-legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: var(--pmto-slate-700);
+    }
+
+    .chart-legend-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .bar-chart-row {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .bar-chart-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11.5px;
+    }
+
+    .bar-chart-track {
+      height: 9px;
+      background: var(--pmto-slate-200);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      display: flex;
+    }
+
+    .bar-chart-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      transition: width 0.4s ease;
+    }
+
+    /* Painel Grid duplo */
+    .dashboard-split-grid {
+      display: grid;
+      grid-template-columns: 1.55fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 1024px) {
+      .dashboard-split-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .content-card {
+      background: var(--white);
+      border: 1px solid var(--pmto-slate-200);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .content-card-header {
+      padding: 14px 18px;
+      background: var(--white);
+      border-bottom: 1px solid var(--pmto-slate-200);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .content-card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--pmto-navy-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .content-card-title svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--pmto-navy-light);
+    }
+
+    .content-card-body {
+      padding: 16px 18px;
+      flex: 1;
+    }
+
+    /* Barra de Ações & Filtros */
+    .actions-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 16px;
+      background: var(--white);
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--pmto-slate-200);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .search-filter-group {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .search-input-box {
+      position: relative;
+      min-width: 260px;
+      flex: 1;
+      max-width: 420px;
+    }
+
+    .search-input-box svg {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 15px;
+      height: 15px;
+      stroke: var(--pmto-slate-400);
+      pointer-events: none;
+    }
+
+    .search-input-box input {
+      width: 100%;
+      padding: 8px 12px 8px 34px;
+      border: 1px solid var(--pmto-slate-300);
+      border-radius: var(--radius-md);
+      font-size: 12.5px;
+      color: var(--pmto-slate-800);
+      background-color: var(--pmto-slate-50);
+      transition: all 0.2s;
+    }
+
+    .search-input-box input:focus {
+      background-color: var(--white);
+      border-color: var(--pmto-navy-primary);
+      outline: none;
+    }
+
+    .filter-select {
+      padding: 8px 12px;
+      border: 1px solid var(--pmto-slate-300);
+      border-radius: var(--radius-md);
+      font-size: 12.5px;
+      color: var(--pmto-slate-700);
+      background-color: var(--pmto-slate-50);
+      cursor: pointer;
+    }
+
+    .filter-select:focus {
+      border-color: var(--pmto-navy-primary);
+      background-color: var(--white);
+      outline: none;
+    }
+
+    .results-counter {
+      font-size: 12.5px;
+      color: var(--pmto-slate-500);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    /* Botões Gerais */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 8px 15px;
+      font-size: 12.5px;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn svg {
+      width: 15px;
+      height: 15px;
+      stroke: currentColor;
+    }
+
+    .btn-primary {
+      background-color: var(--pmto-navy-primary);
+      color: var(--white);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--pmto-navy-dark);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-secondary {
+      background-color: var(--white);
+      border-color: var(--pmto-slate-300);
+      color: var(--pmto-slate-700);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--pmto-slate-100);
+      border-color: var(--pmto-slate-400);
+    }
+
+    .btn-sm {
+      padding: 5px 9px;
+      font-size: 11.5px;
+      border-radius: var(--radius-sm);
+    }
+
+    .btn-danger {
+      background-color: #EF4444;
+      color: var(--white);
+    }
+
+    .btn-danger:hover {
+      background-color: #DC2626;
+    }
+
+    /* Tabelas Compactas com Cabeçalho Fixo */
+    .table-responsive-container {
+      background: var(--white);
+      border: 1px solid var(--pmto-slate-200);
+      border-radius: var(--radius-md);
+      overflow: auto;
+      max-height: 650px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 12px;
+      text-align: left;
+    }
+
+    .data-table thead th {
+      background-color: #F8FAFC;
+      color: var(--pmto-slate-700);
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      padding: 10px 12px;
+      border-bottom: 2px solid var(--pmto-slate-300);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      white-space: nowrap;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+
+    .data-table tbody tr {
+      transition: background-color 0.15s;
+    }
+
+    .data-table tbody tr:nth-child(even) {
+      background-color: #FCFDFE;
+    }
+
+    .data-table tbody tr:hover {
+      background-color: #F1F5F9;
+    }
+
+    .data-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--pmto-slate-200);
+      vertical-align: middle;
+      color: var(--pmto-slate-800);
+    }
+
+    .td-num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .th-num {
+      text-align: right !important;
+    }
+
+    .truncate-text {
+      max-width: 230px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Selos Coloridos / Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: var(--radius-full);
+      font-size: 10.5px;
+      font-weight: 700;
+      white-space: nowrap;
+      border: 1px solid transparent;
+      line-height: 1.2;
+    }
+
+    .badge-vencido {
+      background-color: var(--status-vencido-bg);
+      color: var(--status-vencido-text);
+      border-color: var(--status-vencido-border);
+    }
+
+    .badge-critico {
+      background-color: var(--status-critico-bg);
+      color: var(--status-critico-text);
+      border-color: var(--status-critico-border);
+    }
+
+    .badge-atencao {
+      background-color: var(--status-atencao-bg);
+      color: var(--status-atencao-text);
+      border-color: var(--status-atencao-border);
+    }
+
+    .badge-monitorar {
+      background-color: var(--status-monitorar-bg);
+      color: var(--status-monitorar-text);
+      border-color: var(--status-monitorar-border);
+    }
+
+    .badge-regular {
+      background-color: var(--status-regular-bg);
+      color: var(--status-regular-text);
+      border-color: var(--status-regular-border);
+    }
+
+    .badge-secondary {
+      background-color: var(--pmto-slate-200);
+      color: var(--pmto-slate-700);
+      border-color: var(--pmto-slate-300);
+    }
+
+    .confidence-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 6px;
+      border-radius: var(--radius-full);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .confidence-high { background-color: #DCFCE7; color: #166534; border: 1px solid #86EFAC; }
+    .confidence-medium { background-color: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; }
+    .confidence-low { background-color: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; }
+
+    .table-actions {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      justify-content: flex-end;
+    }
+
+    .action-icon-btn {
+      background: transparent;
+      border: 1px solid var(--pmto-slate-300);
+      color: var(--pmto-slate-600);
+      padding: 4px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .action-icon-btn:hover {
+      background: var(--pmto-slate-100);
+      color: var(--pmto-navy-primary);
+      border-color: var(--pmto-navy-light);
+    }
+
+    .action-icon-btn.btn-delete:hover {
+      background: var(--status-vencido-bg);
+      color: var(--status-vencido-text);
+      border-color: var(--status-vencido-border);
+    }
+
+    .action-icon-btn svg {
+      width: 13px;
+      height: 13px;
+      stroke: currentColor;
+    }
+
+    /* Lista de Pendências */
+    .pendencias-list {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .pendencia-item {
+      background: var(--pmto-slate-50);
+      border: 1px solid var(--pmto-slate-200);
+      border-left: 4px solid #8B5CF6;
+      border-radius: var(--radius-sm);
+      padding: 9px 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12.5px;
+    }
+
+    .pendencia-info strong {
+      color: var(--pmto-slate-900);
+    }
+
+    .pendencia-info p {
+      font-size: 11.5px;
+      color: var(--pmto-slate-600);
+      margin-top: 2px;
+    }
+
+    /* Aba Alertas */
+    .alert-group {
+      margin-bottom: 20px;
+      border: 1px solid var(--pmto-slate-200);
+      border-radius: var(--radius-lg);
+      background: var(--white);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .alert-banner {
+      padding: 14px 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      border-bottom: 1px solid transparent;
+    }
+
+    .alert-banner-vencido { background: #FEF2F2; border-bottom-color: var(--status-vencido-border); color: var(--status-vencido-text); }
+    .alert-banner-critico { background: #FFF7ED; border-bottom-color: var(--status-critico-border); color: var(--status-critico-text); }
+    .alert-banner-atencao { background: #FFFBEB; border-bottom-color: var(--status-atencao-border); color: var(--status-atencao-text); }
+    .alert-banner-monitorar { background: #EFF6FF; border-bottom-color: var(--status-monitorar-border); color: var(--status-monitorar-text); }
+    .alert-banner-regular { background: #F0FDF4; border-bottom-color: var(--status-regular-border); color: var(--status-regular-text); }
+
+    .alert-banner-icon {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .alert-banner-icon svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+    }
+
+    .alert-banner-text h3 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    .alert-banner-text p {
+      font-size: 12.5px;
+      line-height: 1.45;
+    }
+
+    .alert-contracts-list {
+      padding: 10px 16px;
+    }
+
+    .alert-contract-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 11px;
+      border-bottom: 1px solid var(--pmto-slate-100);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .alert-contract-card:last-child {
+      border-bottom: none;
+    }
+
+    /* Aba Como Usar */
+    .guide-section {
+      background: var(--white);
+      border: 1px solid var(--pmto-slate-200);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      margin-bottom: 22px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .guide-section h2 {
+      font-size: 17px;
+      color: var(--pmto-navy-primary);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 2px solid var(--pmto-slate-100);
+      padding-bottom: 8px;
+    }
+
+    .guide-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 18px;
+    }
+
+    .guide-card {
+      background: var(--pmto-slate-50);
+      border: 1px solid var(--pmto-slate-200);
+      border-left: 4px solid var(--pmto-navy-primary);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+    }
+
+    .guide-card.guide-warning {
+      border-left-color: var(--pmto-gold);
+      background: #FFFDF9;
+    }
+
+    .guide-card h3 {
+      font-size: 14px;
+      color: var(--pmto-slate-900);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .guide-card p, .guide-card ul {
+      font-size: 12.5px;
+      color: var(--pmto-slate-700);
+      line-height: 1.55;
+    }
+
+    .guide-card ul {
+      padding-left: 18px;
+      margin-top: 6px;
+    }
+
+    /* Rodapé Institucional */
+    .footer-pmto {
+      background: var(--pmto-slate-900);
+      color: var(--pmto-slate-300);
+      border-top: 1px solid var(--pmto-slate-700);
+      padding: 20px 28px;
+      margin-top: auto;
+    }
+
+    .footer-container {
+      max-width: 1500px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 18px;
+    }
+
+    .footer-info {
+      font-size: 12.5px;
+    }
+
+    .footer-info .privacy-alert {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 5px 10px;
+      border-radius: var(--radius-md);
+      color: var(--pmto-gold-light);
+      margin-top: 5px;
+      font-size: 11.5px;
+    }
+
+    .footer-actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* Modais */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .modal-backdrop.active {
+      display: flex;
+    }
+
+    .modal-dialog {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 920px;
+      box-shadow: var(--shadow-xl);
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: modalSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalSlideIn {
+      from { transform: translateY(16px) scale(0.98); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .modal-header {
+      background: var(--pmto-navy-primary);
+      color: var(--white);
+      padding: 16px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid var(--pmto-gold);
+    }
+
+    .modal-header h2 {
+      font-size: 17px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-close-btn {
+      background: transparent;
+      border: none;
+      color: var(--white);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+
+    .modal-close-btn:hover {
+      opacity: 1;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .modal-body {
+      padding: 22px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .modal-footer {
+      padding: 14px 22px;
+      background: var(--pmto-slate-50);
+      border-top: 1px solid var(--pmto-slate-200);
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Área de Anexar Contrato */
+    .upload-zone-wrapper {
+      background: #F0F7FF;
+      border: 2px solid #3B82F6;
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      margin-bottom: 22px;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+    }
+
+    .upload-zone-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .upload-zone-title {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--pmto-navy-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .local-guarantee-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #065F46;
+      background: #D1FAE5;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      border: 1px solid #A7F3D0;
+    }
+
+    .dropzone-box {
+      border: 2px dashed #93C5FD;
+      background: var(--white);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .dropzone-box:hover, .dropzone-box.dragover {
+      border-color: var(--pmto-navy-primary);
+      background: #F0F7FF;
+    }
+
+    .dropzone-icon {
+      width: 40px;
+      height: 40px;
+      stroke: var(--pmto-navy-primary);
+      margin-bottom: 8px;
+    }
+
+    .dropzone-text {
+      font-size: 13.5px;
+      color: var(--pmto-slate-700);
+      margin-bottom: 5px;
+    }
+
+    .dropzone-subtext {
+      font-size: 11.5px;
+      color: var(--pmto-slate-500);
+    }
+
+    .extraction-progress-container {
+      display: none;
+      margin-top: 12px;
+      background: var(--white);
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--pmto-slate-200);
+    }
+
+    .progress-bar-track {
+      height: 7px;
+      background: var(--pmto-slate-200);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--pmto-navy-primary), var(--pmto-gold));
+      transition: width 0.3s ease;
+    }
+
+    .progress-label-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11.5px;
+      color: var(--pmto-slate-600);
+    }
+
+    .extracted-text-panel {
+      display: none;
+      margin-top: 14px;
+      background: var(--white);
+      border: 1px solid var(--pmto-slate-300);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .extracted-text-header {
+      padding: 9px 13px;
+      background: var(--pmto-slate-100);
+      border-bottom: 1px solid var(--pmto-slate-300);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+
+    .extracted-text-content {
+      padding: 11px;
+      max-height: 140px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 11px;
+      white-space: pre-wrap;
+      color: var(--pmto-slate-800);
+      background: #FAFAFA;
+      border: none;
+      width: 100%;
+      resize: vertical;
+    }
+
+    .extraction-review-panel {
+      display: none;
+      margin-top: 14px;
+      background: var(--white);
+      border: 1px solid #93C5FD;
+      border-radius: var(--radius-md);
+      padding: 14px;
+    }
+
+    .extraction-review-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid var(--pmto-slate-200);
+      padding-bottom: 8px;
+    }
+
+    .extraction-review-header h4 {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--pmto-navy-primary);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .extracted-fields-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      max-height: 260px;
+      overflow-y: auto;
+      padding-right: 4px;
+      margin-bottom: 12px;
+    }
+
+    .extracted-field-row {
+      display: grid;
+      grid-template-columns: 135px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 11px;
+      border: 1px solid var(--pmto-slate-200);
+      border-radius: var(--radius-sm);
+      background: var(--pmto-slate-50);
+      font-size: 11.5px;
+    }
+
+    .extracted-field-name {
+      font-weight: 700;
+      color: var(--pmto-slate-700);
+    }
+
+    .extracted-field-val {
+      color: var(--pmto-slate-900);
+      font-weight: 600;
+    }
+
+    .extracted-field-snippet {
+      font-size: 10.5px;
+      color: var(--pmto-slate-500);
+      font-style: italic;
+      margin-top: 2px;
+    }
+
+    .extraction-apply-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      background: var(--pmto-slate-50);
+      padding: 9px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--pmto-slate-200);
+    }
+
+    /* Formulário */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px 18px;
+    }
+
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .form-group.col-span-2 {
+      grid-column: span 2;
+    }
+
+    @media (max-width: 768px) {
+      .form-group.col-span-2 {
+        grid-column: span 1;
+      }
+    }
+
+    .form-label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--pmto-slate-800);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .form-label .required {
+      color: #DC2626;
+      margin-left: 2px;
+    }
+
+    .form-help {
+      font-size: 11px;
+      color: var(--pmto-slate-500);
+      font-style: italic;
+    }
+
+    .form-control {
+      padding: 8px 11px;
+      border: 1px solid var(--pmto-slate-300);
+      border-radius: var(--radius-md);
+      font-size: 12.5px;
+      color: var(--pmto-slate-800);
+      background-color: var(--white);
+      transition: border-color 0.15s, background-color 0.15s;
+      width: 100%;
+    }
+
+    .form-control:focus {
+      border-color: var(--pmto-navy-primary);
+      box-shadow: 0 0 0 1px var(--pmto-navy-primary);
+      outline: none;
+    }
+
+    .form-control.highlight-applied {
+      animation: fieldPulse 1.8s ease-out;
+    }
+
+    @keyframes fieldPulse {
+      0% { background-color: #FEF08A; border-color: #CA8A04; }
+      100% { background-color: var(--white); border-color: var(--pmto-slate-300); }
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 55px;
+    }
+
+    .form-calculation-summary {
+      grid-column: span 2;
+      background: var(--pmto-slate-50);
+      border: 1px solid var(--pmto-slate-200);
+      border-radius: var(--radius-md);
+      padding: 11px 15px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .calc-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .calc-label {
+      font-size: 10.5px;
+      color: var(--pmto-slate-500);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .calc-val {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--pmto-navy-primary);
+    }
+
+    .attached-file-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #EFF6FF;
+      color: var(--pmto-navy-primary);
+      border: 1px solid #BFDBFE;
+      padding: 3px 9px;
+      border-radius: var(--radius-full);
+      font-size: 11.5px;
+      max-width: 240px;
+    }
+
+    .attached-file-pill span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      pointer-events: none;
+    }
+
+    .toast {
+      pointer-events: auto;
+      background: var(--pmto-slate-900);
+      color: var(--white);
+      padding: 11px 16px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      font-size: 12.5px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      animation: toastIn 0.3s ease-out forwards;
+      border-left: 4px solid var(--pmto-navy-light);
+      max-width: 400px;
+    }
+
+    .toast-success { border-left-color: #10B981; }
+    .toast-error { border-left-color: #EF4444; }
+    .toast-warning { border-left-color: var(--pmto-gold); }
+
+    @keyframes toastIn {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .paste-modal-textarea {
+      width: 100%;
+      height: 240px;
+      font-family: monospace;
+      font-size: 11.5px;
+      padding: 11px;
+      border: 1px solid var(--pmto-slate-300);
+      border-radius: var(--radius-md);
+      resize: vertical;
+    }
+
+    /* Impressão */
+    @media print {
+      body { background: #FFF !important; color: #000 !important; font-size: 10pt; }
+      .header-pmto { background: none !important; color: #000 !important; border-bottom: 2px solid #000 !important; padding: 0 0 10px 0 !important; }
+      .brand-titles h1 { color: #000 !important; font-size: 14pt !important; }
+      .brand-titles p, .header-info-box { color: #333 !important; }
+      .nav-tabs-wrapper, .actions-bar, .footer-actions, .action-icon-btn, .btn, .modal-backdrop, .toast-container, .db-status-pill { display: none !important; }
+      .tab-pane { display: block !important; }
+      #tab-como-usar, #tab-alertas, #tab-reajustes { page-break-before: always; }
+      .content-card, .table-responsive-container { border: 1px solid #CCC !important; box-shadow: none !important; max-height: none !important; overflow: visible !important; }
+      .data-table thead th { position: static !important; background: #EEE !important; color: #000 !important; border-bottom: 1px solid #000 !important; }
+      .data-table td { border-bottom: 1px solid #DDD !important; font-size: 8.5pt !important; padding: 6px !important; }
+      .badge { border: 1px solid #000 !important; background: #FFF !important; color: #000 !important; }
+      .footer-pmto { background: none !important; color: #555 !important; border-top: 1px solid #CCC !important; padding: 10px 0 !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CABEÇALHO INSTITUCIONAL PMTO -->
+  <header class="header-pmto" role="banner">
+    <div class="header-container">
+      <div class="brand-section">
+        <!-- Brasão Oficial PMTO em SVG -->
+        <svg class="pmto-crest-icon" viewBox="0 0 100 100" aria-label="Brasão PMTO" role="img">
+          <polygon points="50,5 92,20 80,75 50,95 20,75 8,20" fill="#1B365D" stroke="#D97706" stroke-width="4"></polygon>
+          <path d="M50,15 L82,27 L72,70 L50,85 L28,70 L18,27 Z" fill="#0A192F"></path>
+          <line x1="28" y1="72" x2="72" y2="28" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"></line>
+          <line x1="72" y1="72" x2="28" y2="28" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"></line>
+          <circle cx="50" cy="50" r="14" fill="#D97706" stroke="#FFFFFF" stroke-width="2"></circle>
+          <polygon points="50,40 53,47 61,48 55,53 57,60 50,56 43,60 45,53 39,48 47,47" fill="#FFFFFF"></polygon>
+        </svg>
+        <div class="brand-titles">
+          <h1><span class="sigla">SIGEC</span> — Sistema de Gestão de Contratos e Vigências | PMTO</h1>
+          <p>Polícia Militar do Estado do Tocantins — Gerência de Contratos e Convênios</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Indicador de Banco de Dados -->
+        <button class="db-status-pill" onclick="openDatabaseModal()" title="Clique para gerenciar ou conectar ao Supabase (PostgreSQL Nuvem Grátis)">
+          <span class="db-status-dot" id="db-status-dot"></span>
+          <span id="db-status-text">Banco: SQLite Gratuito (Ativo)</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px; stroke: #A7F3D0;"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+        </button>
+
+        <div class="header-info-box" aria-label="Data atual do sistema">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <div>
+            <span style="display:block; font-size: 10px; color: var(--pmto-slate-300); text-transform: uppercase; font-weight:600;">Data de Referência</span>
+            <strong id="header-today-date">Carregando...</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAVEGAÇÃO POR ABAS -->
+  <nav class="nav-tabs-wrapper" aria-label="Navegação Principal">
+    <div class="nav-tabs-container" role="tablist">
+      <button class="nav-tab-btn active" role="tab" aria-selected="true" aria-controls="tab-painel" id="tab-btn-painel" onclick="switchTab('painel')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="9"></rect>
+          <rect x="14" y="3" width="7" height="5"></rect>
+          <rect x="14" y="12" width="7" height="9"></rect>
+          <rect x="3" y="16" width="7" height="5"></rect>
+        </svg>
+        Painel
+      </button>
+
+      <button class="nav-tab-btn" role="tab" aria-selected="false" aria-controls="tab-contratos" id="tab-btn-contratos" onclick="switchTab('contratos')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+        Contratos
+        <span class="badge-counter" id="tab-counter-contratos">0</span>
+      </button>
+
+      <button class="nav-tab-btn" role="tab" aria-selected="false" aria-controls="tab-alertas" id="tab-btn-alertas" onclick="switchTab('alertas')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        Alertas
+        <span class="badge-counter" id="tab-counter-alertas" style="background-color: var(--status-critico-bg); color: var(--status-critico-text);">0</span>
+      </button>
+
+      <button class="nav-tab-btn" role="tab" aria-selected="false" aria-controls="tab-reajustes" id="tab-btn-reajustes" onclick="switchTab('reajustes')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="1" x2="12" y2="23"></line>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+        </svg>
+        Reajustes
+        <span class="badge-counter" id="tab-counter-reajustes">0</span>
+      </button>
+
+      <button class="nav-tab-btn" role="tab" aria-selected="false" aria-controls="tab-como-usar" id="tab-btn-como-usar" onclick="switchTab('como-usar')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        Como usar
+      </button>
+    </div>
+  </nav>
+
+  <!-- ÁREA DE CONTEÚDO PRINCIPAL -->
+  <main class="main-content" role="main">
+
+    <!-- ABA 1: PAINEL (DASHBOARD) -->
+    <section class="tab-pane active" id="tab-painel" role="tabpanel" aria-labelledby="tab-btn-painel">
+      <!-- Indicadores KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi-card" tabindex="0">
+          <div class="kpi-header">
+            <span class="kpi-title">Total Contratos</span>
+            <svg class="kpi-icon" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+          </div>
+          <div class="kpi-value" id="kpi-total">0</div>
+          <div class="kpi-subtext">No banco de dados</div>
+        </div>
+
+        <div class="kpi-card kpi-vencidos" tabindex="0">
+          <div class="kpi-header">
+            <span class="kpi-title">Vencidos</span>
+            <svg class="kpi-icon" style="stroke: var(--status-vencido-text);" viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+          </div>
+          <div class="kpi-value" style="color: var(--status-vencido-text);" id="kpi-vencidos">0</div>
+          <div class="kpi-subtext">Vigência expirada</div>
+        </div>
+
+        <div class="kpi-card kpi-critico" tabindex="0">
+          <div class="kpi-header">
+            <span class="kpi-title">Até 30 dias</span>
+            <svg class="kpi-icon" style="stroke: var(--status-critico-text);" viewBox="0 0 24 24" fill="none" stroke-width="2"><polygon points="12 2 2 22 22 22"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          </div>
+          <div class="kpi-value" style="color: var(--status-critico-text);" id="kpi-critico">0</div>
+          <div class="kpi-subtext">Faixa Crítica</div>
+        </div>
+
+        <div class="kpi-card kpi-atencao" tabindex="0">
+          <div class="kpi-header">
+            <span class="kpi-title">Até 60 dias</span>
+            <svg class="kpi-icon" style="stroke: var(--status-atencao-text);" viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          </div>
+          <div class="kpi-value" style="color: var(--status-atencao-text);" id="kpi-atencao">0</div>
+          <div class="kpi-subtext">Faixa de Atenção</div>
+        </div>
+
+        <div class="kpi-card kpi-monitorar" tabindex="0">
+          <div class="kpi-header">
+            <span class="kpi-title">Até 90 dias</span>
+            <svg class="kpi-icon" style="stroke: var(--status-monitorar-text);" viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          </div>
+          <div class="kpi-value" style="color: var(--status-monitorar-text);" id="kpi-monitorar">0</div>
+          <div class="kpi-subtext">Monitoramento</div>
+        </div>
+
+        <div class="kpi-card" tabindex="0">
+          <div class="kpi-header">
+            <span class="kpi-title">Soma Mensal</span>
+            <svg class="kpi-icon" viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+          </div>
+          <div class="kpi-value" style="font-size: 17px;" id="kpi-soma-mensal">R$ 0,00</div>
+          <div class="kpi-subtext">Impacto estimado/mês</div>
+        </div>
+
+        <div class="kpi-card" tabindex="0">
+          <div class="kpi-header">
+            <span class="kpi-title">Soma Total</span>
+            <svg class="kpi-icon" viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          </div>
+          <div class="kpi-value" style="font-size: 17px;" id="kpi-soma-total">R$ 0,00</div>
+          <div class="kpi-subtext">Valor global vigente</div>
+        </div>
+
+        <div class="kpi-card kpi-pendencias" tabindex="0">
+          <div class="kpi-header">
+            <span class="kpi-title">Pendências</span>
+            <svg class="kpi-icon" style="stroke: #8B5CF6;" viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          </div>
+          <div class="kpi-value" style="color: #7C3AED;" id="kpi-pendencias">0</div>
+          <div class="kpi-subtext">Campos incompletos</div>
+        </div>
+      </div>
+
+      <!-- SEÇÃO DE GRÁFICOS GERENCIAIS -->
+      <section class="charts-section" aria-label="Gráficos analíticos dos contratos e processos">
+        <div class="charts-section-header">
+          <div class="charts-section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 24px; height: 24px; stroke: var(--pmto-gold); flex-shrink: 0;">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            <div>
+              <h3>Painel Gráfico Gerencial de Processos e Contratos</h3>
+              <p style="font-size: 12px; color: var(--pmto-slate-500); font-weight: normal; margin-top: 1px;">
+                Estatísticas visuais de prazos de vigência, impacto orçamentário e limites legais da PMTO
+              </p>
+            </div>
+          </div>
+          <span class="badge badge-secondary" id="charts-total-badge" style="font-size: 11.5px; padding: 4px 10px;">0 processos</span>
+        </div>
+
+        <div class="charts-grid">
+          <!-- Gráfico 1: Donut de Faixas de Alerta -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <span class="chart-card-title">Distribuição por Faixa de Alerta</span>
+              <span class="chart-card-subtitle">Volume de processos por urgência</span>
+            </div>
+            <div class="chart-card-body" style="display: flex; flex-direction: column; align-items: center;">
+              <div id="chart-faixas-donut-container" style="width: 100%; height: 170px; display: flex; justify-content: center; align-items: center; position: relative;"></div>
+              <div id="chart-faixas-legend" class="chart-legend"></div>
+            </div>
+          </div>
+
+          <!-- Gráfico 2: Volume Financeiro por Faixa -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <span class="chart-card-title">Impacto Financeiro por Faixa (R$)</span>
+              <span class="chart-card-subtitle">Distribuição do orçamento contratado</span>
+            </div>
+            <div class="chart-card-body">
+              <div id="chart-financeiro-bars" style="display: flex; flex-direction: column; gap: 10px;"></div>
+            </div>
+          </div>
+
+          <!-- Gráfico 3: Limites Legais de Aditivos -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <span class="chart-card-title">Limites de Aditivos (Lei 14.133/2021)</span>
+              <span class="chart-card-subtitle">Conformidade com o teto de 25% e 50%</span>
+            </div>
+            <div class="chart-card-body">
+              <div id="chart-limites-container" style="display: flex; flex-direction: column; gap: 11px;"></div>
+            </div>
+          </div>
+
+          <!-- Gráfico 4: Top 5 Maiores Contratos -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <span class="chart-card-title">Top 5 Maiores Contratos (R$)</span>
+              <span class="chart-card-subtitle">Processos com maior impacto orçamentário</span>
+            </div>
+            <div class="chart-card-body">
+              <div id="chart-top-contratos-bars" style="display: flex; flex-direction: column; gap: 9px;"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Painel Split: Próximos Vencimentos e Pendências -->
+      <div class="dashboard-split-grid">
+        <div class="content-card">
+          <div class="content-card-header">
+            <div class="content-card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              Próximos Vencimentos
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="switchTab('contratos')">Ver todos</button>
+          </div>
+          <div class="content-card-body" style="padding: 0;">
+            <div class="table-responsive-container" style="max-height: 400px; border: none;">
+              <table class="data-table" aria-label="Tabela de próximos vencimentos">
+                <thead>
+                  <tr>
+                    <th>Fornecedor</th>
+                    <th>Contrato</th>
+                    <th>Fim Vigência</th>
+                    <th>Dias Restantes</th>
+                    <th>Faixa</th>
+                    <th class="th-num">Valor Total</th>
+                    <th style="text-align: right;">Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="painel-vencimentos-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-card">
+          <div class="content-card-header">
+            <div class="content-card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+              Pendências de Dados Cadastrais
+            </div>
+            <span class="badge badge-secondary" id="badge-total-pendencias">0 pendências</span>
+          </div>
+          <div class="content-card-body">
+            <p style="font-size: 12px; color: var(--pmto-slate-600); margin-bottom: 12px;">
+              Contratos com campos em branco. Clique para completar o cadastro:
+            </p>
+            <div class="pendencias-list" id="painel-pendencias-list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABA 2: CONTRATOS (GESTÃO COMPLETA) -->
+    <section class="tab-pane" id="tab-contratos" role="tabpanel" aria-labelledby="tab-btn-contratos">
+      <div class="actions-bar">
+        <div class="search-filter-group">
+          <button class="btn btn-primary" onclick="openContractModal()" id="btn-novo-contrato">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            + Novo Contrato
+          </button>
+
+          <div class="search-input-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="contratos-search-input" placeholder="Buscar fornecedor, processo, contrato..." oninput="filterContracts()">
+          </div>
+
+          <select class="filter-select" id="contratos-filter-faixa" onchange="filterContracts()" aria-label="Filtrar por Faixa de Alerta">
+            <option value="TODAS">Todas as Faixas de Alerta</option>
+            <option value="Vencido">🔴 Vencido</option>
+            <option value="Crítico (≤30 dias)">🟠 Crítico (≤30 dias)</option>
+            <option value="Atenção (≤60 dias)">🟡 Atenção (≤60 dias)</option>
+            <option value="Monitorar (≤90 dias)">🔵 Monitorar (≤90 dias)</option>
+            <option value="Regular (>90 dias)">🟢 Regular (>90 dias)</option>
+          </select>
+
+          <select class="filter-select" id="contratos-sort-by" onchange="filterContracts()" aria-label="Ordenar contratos">
+            <option value="dias-asc">Dias Restantes (Mais urgentes)</option>
+            <option value="dias-desc">Dias Restantes (Mais distantes)</option>
+            <option value="fornecedor-asc">Fornecedor (A-Z)</option>
+            <option value="valor-desc">Valor Total (Maior primeiro)</option>
+            <option value="contrato-asc">Número do Contrato</option>
+          </select>
+        </div>
+
+        <div class="results-counter" id="contratos-count-label">Exibindo 0 contratos</div>
+      </div>
+
+      <div class="table-responsive-container">
+        <table class="data-table" id="tabela-contratos" aria-label="Tabela detalhada de contratos e vigências">
+          <thead>
+            <tr>
+              <th>Fornecedor</th>
+              <th>Objeto</th>
+              <th>Processo</th>
+              <th>Contrato</th>
+              <th>Aditivo</th>
+              <th>Início Vigência</th>
+              <th>Fim Vigência</th>
+              <th class="th-num">Dias Restantes</th>
+              <th>Faixa de Alerta</th>
+              <th class="th-num">Valor Mensal</th>
+              <th class="th-num">Valor Total</th>
+              <th class="th-num">Valor Inicial</th>
+              <th class="th-num">Valor Aditivos</th>
+              <th class="th-num">% Aditivo</th>
+              <th>Limite Legal</th>
+              <th class="th-num">Saldo Aditivo</th>
+              <th>Situação Limite</th>
+              <th>Fiscal / Gestor</th>
+              <th style="text-align: right; min-width: 100px;">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="contratos-table-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ABA 3: ALERTAS -->
+    <section class="tab-pane" id="tab-alertas" role="tabpanel" aria-labelledby="tab-btn-alertas">
+      <div id="alertas-container"></div>
+    </section>
+
+    <!-- ABA 4: REAJUSTES -->
+    <section class="tab-pane" id="tab-reajustes" role="tabpanel" aria-labelledby="tab-btn-reajustes">
+      <div class="content-card" style="margin-bottom: 22px;">
+        <div class="content-card-body" style="background: #F8FAFC; border-left: 5px solid var(--pmto-navy-primary);">
+          <h3 style="font-size: 15px; color: var(--pmto-navy-primary); margin-bottom: 6px; font-weight: 700;">
+            Controle de Reajuste em Sentido Estrito e Prazos de Preclusão
+          </h3>
+          <p style="font-size: 12.5px; color: var(--pmto-slate-700); line-height: 1.6;">
+            <strong>Regra Fundamental de Preclusão:</strong> O direito ao reajuste por apostilamento <em>preclui com a assinatura de termo aditivo de prorrogação sem a expressa ressalva do pleito pendente</em> (Súmula nº 222 do TCU e Lei 14.133/2021). O reajuste recompõe perdas inflacionárias após interregno mínimo de 12 meses (Lei 10.192/2001).
+          </p>
+        </div>
+      </div>
+
+      <div class="table-responsive-container">
+        <table class="data-table" aria-label="Tabela de controle de reajustes e preclusão">
+          <thead>
+            <tr>
+              <th>Fornecedor</th>
+              <th>Contrato</th>
+              <th>Objeto</th>
+              <th>Marco do Reajuste</th>
+              <th>Prazo de Preclusão</th>
+              <th class="th-num">Dias até Preclusão</th>
+              <th>Situação do Reajuste</th>
+              <th style="text-align: right;">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="reajustes-table-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ABA 5: COMO USAR -->
+    <section class="tab-pane" id="tab-como-usar" role="tabpanel" aria-labelledby="tab-btn-como-usar">
+      <div class="guide-section">
+        <h2>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px;">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+          Regras Operacionais e Legislação Aplicada
+        </h2>
+
+        <div class="guide-grid">
+          <div class="guide-card">
+            <h3>1. Contagem de Vigência (Regra do 1º Dia Útil)</h3>
+            <p>
+              Art. 183 da Lei 14.133/2021: <strong>exclui-se o dia do início e inclui-se o do vencimento</strong>. A vigência tem início no <strong>primeiro dia útil subsequente</strong> à data da assinatura formal ou publicação.
+            </p>
+          </div>
+
+          <div class="guide-card">
+            <h3>2. Aditivo de Valor vs. Prazo</h3>
+            <p>
+              A prorrogação de prazo em serviços contínuos (art. 106/107) <em>NÃO consome</em> a margem legal de 25% de alteração contratual (arts. 124 e 125).
+            </p>
+          </div>
+
+          <div class="guide-card">
+            <h3>3. Limites Legais (25% e 50%)</h3>
+            <p>
+              <strong>25% (Padrão):</strong> Compras e serviços comuns.<br>
+              <strong>50% (Exceção):</strong> Exclusivamente para reforma de edifício ou equipamento.
+            </p>
+          </div>
+
+          <div class="guide-card">
+            <h3>4. Banco de Dados Gratuito Pronto para Uso</h3>
+            <p>
+              O sistema opera com <strong>SQLite Local Gratuito</strong> de alto desempenho e possui integração nativa em 1 clique com <strong>Supabase (PostgreSQL Gratuito na Nuvem)</strong> para trabalho em equipe!
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- RODAPÉ INSTITUCIONAL -->
+  <footer class="footer-pmto" role="contentinfo">
+    <div class="footer-container">
+      <div class="footer-info">
+        <strong>Polícia Militar do Estado do Tocantins — Quartel do Comando Geral (QCG)</strong>
+        <p style="color: var(--pmto-slate-400); font-size: 11.5px; margin-top: 2px;">
+          Gerência de Contratos e Convênios | Diretoria de Apoio Logístico (DAL)
+        </p>
+        <div class="privacy-alert">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 13px; height: 13px;">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <span id="footer-storage-info">Banco de Dados Ativo: SQLite Local Gratuito (Integrado)</span>
+        </div>
+      </div>
+
+      <div class="footer-actions">
+        <button class="btn btn-secondary btn-sm" onclick="exportContractsCSV()" title="Baixar planilha CSV">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Exportar CSV
+        </button>
+
+        <button class="btn btn-secondary btn-sm" onclick="exportContractsJSON()" title="Baixar backup JSON">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+          Backup JSON
+        </button>
+
+        <button class="btn btn-secondary btn-sm" onclick="triggerImportJSON()" title="Importar backup JSON">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+          Importar JSON
+        </button>
+        <input type="file" id="import-json-file-input" accept=".json" style="display:none;" onchange="handleImportJSON(event)">
+
+        <button class="btn btn-secondary btn-sm" onclick="confirmResetSampleData()" title="Recarregar dados de exemplo da PMTO">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+          Restaurar Exemplos
+        </button>
+
+        <button class="btn btn-sm" onclick="openDatabaseModal()" style="background: #10B981; border: 1px solid #059669; color: #FFF; font-weight: 700;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+          Configurar Banco
+        </button>
+
+        <button class="btn btn-primary btn-sm" onclick="window.print()" title="Imprimir tela ou salvar como PDF">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          Imprimir / PDF
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODAL: CADASTRAR / EDITAR CONTRATO -->
+  <div class="modal-backdrop" id="modal-contrato-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-contract-title">
+    <div class="modal-dialog" id="modal-contrato-dialog">
+      <div class="modal-header">
+        <h2 id="modal-contract-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+          <span id="modal-title-text">Cadastrar Novo Contrato</span>
+        </h2>
+        <button class="modal-close-btn" onclick="closeContractModal()" aria-label="Fechar (Esc)">✕</button>
+      </div>
+
+      <div class="modal-body" id="modal-contract-body">
+        <!-- ZONA DE EXTRAÇÃO AUTOMÁTICA -->
+        <section class="upload-zone-wrapper">
+          <div class="upload-zone-header">
+            <div class="upload-zone-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 17px; height: 17px;">
+                <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+              </svg>
+              Anexar contrato com leitura automática
+            </div>
+            <div class="local-guarantee-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 12px; height: 12px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              Processamento 100% no seu computador
+            </div>
+          </div>
+
+          <p style="font-size: 12.5px; color: var(--pmto-slate-700); margin-bottom: 10px;">
+            Anexe o contrato em <strong>PDF, DOCX, TXT ou imagem</strong> para preenchimento automático:
+          </p>
+
+          <div class="dropzone-box" id="dropzone-box" onclick="triggerFileInput()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleFileDrop(event)">
+            <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <div class="dropzone-text"><strong>Arraste e solte o contrato aqui</strong> ou utilize o botão:</div>
+            <div style="margin: 8px 0;">
+              <button type="button" class="btn btn-primary btn-sm" onclick="triggerFileInput(); event.stopPropagation();">
+                Escolher arquivo (.pdf, .docx, .txt, .png, .jpg)
+              </button>
+            </div>
+            <div class="dropzone-subtext">Formatos aceitos: <code>.pdf, .docx, .txt, .png, .jpg</code> (Até 20 MB)</div>
+            <input type="file" id="contract-file-input" style="display: none;" accept=".pdf,.docx,.txt,.png,.jpg,.jpeg" onchange="handleFileSelected(this.files)">
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 9px; flex-wrap: wrap; gap: 8px;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="openPasteModal()">Colar texto manualmente</button>
+            <div id="current-attachment-display" style="display: none;">
+              <span class="attached-file-pill">
+                <span id="attached-filename-text">arquivo.pdf</span>
+                <button type="button" onclick="removeAttachedFile()" style="border: none; background: none; cursor: pointer; color: #DC2626; padding: 2px;">✕</button>
+              </span>
+            </div>
+          </div>
+
+          <div class="extraction-progress-container" id="extraction-progress-box">
+            <div class="progress-bar-track"><div class="progress-bar-fill" id="extraction-progress-fill"></div></div>
+            <div class="progress-label-row"><span id="extraction-progress-status">Lendo...</span><span id="extraction-progress-percent">0%</span></div>
+          </div>
+
+          <div class="extracted-text-panel" id="extracted-text-panel">
+            <div class="extracted-text-header">
+              <span>Texto Bruto Extraído (<span id="extracted-char-count">0</span> caracteres)</span>
+              <div>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="copyExtractedText()">Copiar</button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="toggleExtractedTextPanel()">Ocultar</button>
+              </div>
+            </div>
+            <div class="extracted-text-content" id="extracted-text-preview"></div>
+          </div>
+
+          <div class="extraction-review-panel" id="extraction-review-panel">
+            <div class="extraction-review-header">
+              <h4>Dados encontrados no documento</h4>
+              <span style="font-size: 11px; color: var(--pmto-slate-500);">Revise antes de salvar</span>
+            </div>
+            <div class="extracted-fields-list" id="extracted-fields-review-list"></div>
+            <div class="extraction-apply-controls">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="discardExtraction()">Descartar</button>
+              <button type="button" class="btn btn-primary btn-sm" onclick="applyExtractedDataToForm()">Aplicar aos campos</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- FORMULÁRIO -->
+        <form id="contract-form" onsubmit="saveContract(event)">
+          <input type="hidden" id="contract-id" value="">
+
+          <div class="form-grid">
+            <div class="form-group col-span-2">
+              <label class="form-label" for="field-fornecedor">
+                <span>Fornecedor <span class="required">*</span></span>
+                <span class="form-help">Razão social da contratada</span>
+              </label>
+              <input type="text" id="field-fornecedor" class="form-control" required placeholder="Razão social da contratada">
+            </div>
+
+            <div class="form-group col-span-2">
+              <label class="form-label" for="field-objeto">
+                <span>Objeto</span>
+                <span class="form-help">Descrição resumida</span>
+              </label>
+              <textarea id="field-objeto" class="form-control" rows="2" placeholder="Descrição resumida do objeto" oninput="checkSuggestedLimitFromObject()"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="field-processo">Processo (SEI/NUP)</label>
+              <input type="text" id="field-processo" class="form-control" placeholder="2026.00000.00000/PMTO">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="field-contrato">Número do Contrato</label>
+              <input type="text" id="field-contrato" class="form-control" placeholder="Ex.: 045/2026">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="field-aditivo-atual">Aditivo Atual</label>
+              <input type="text" id="field-aditivo-atual" class="form-control" placeholder="Ex.: 1º Termo Aditivo">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="field-qtd-aditivos">Quantidade de Aditivos</label>
+              <input type="number" min="0" step="1" id="field-qtd-aditivos" class="form-control" placeholder="0">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="field-inicio-vigencia">Início da Vigência</label>
+              <input type="text" id="field-inicio-vigencia" class="form-control" placeholder="dd/mm/aaaa" oninput="maskDate(this); updateLiveCalculations();">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="field-fim-vigencia">
+                <span>Fim da Vigência <span class="required">*</span></span>
+              </label>
+              <input type="text" id="field-fim-vigencia" class="form-control" required placeholder="dd/mm/aaaa" oninput="maskDate(this); updateLiveCalculations();">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="field-valor-mensal">Valor Mensal (R$)</label>
+              <input type="text" id="field-valor-mensal" class="form-control" placeholder="0,00" oninput="maskCurrency(this); updateLiveCalculations();">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="field-valor-total">Valor Total (R$)</label>
+              <input type="text" id="field-valor-total" class="form-control" placeholder="0,00" oninput="maskCurrency(this); updateLiveCalculations();">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="field-valor-inicial">Valor Inicial (R$)</label>
+              <input type="text" id="field-valor-inicial" class="form-control" placeholder="0,00" oninput="maskCurrency(this); updateLiveCalculations();">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="field-valor-aditivos">Valor Aditivos (R$)</label>
+              <input type="text" id="field-valor-aditivos" class="form-control" placeholder="0,00" oninput="maskCurrency(this); updateLiveCalculations();">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="field-limite-legal">Limite Legal</label>
+              <select id="field-limite-legal" class="form-control" onchange="updateLiveCalculations()">
+                <option value="0.25">25% (Padrão)</option>
+                <option value="0.50">50% (Reforma de edifício ou equipamento)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="field-fiscal">Fiscal / Gestor</label>
+              <input type="text" id="field-fiscal" class="form-control" placeholder="Nome / Matrícula">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="field-marco-reajuste">Marco do Reajuste</label>
+              <input type="text" id="field-marco-reajuste" class="form-control" placeholder="dd/mm/aaaa" oninput="maskDate(this); updateLiveCalculations();">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="field-prazo-preclusao">Prazo de Preclusão</label>
+              <input type="text" id="field-prazo-preclusao" class="form-control" placeholder="dd/mm/aaaa" oninput="maskDate(this); updateLiveCalculations();">
+            </div>
+
+            <div class="form-group col-span-2">
+              <label class="form-label" for="field-observacoes">Observações</label>
+              <textarea id="field-observacoes" class="form-control" rows="2" placeholder="Observações e despachos"></textarea>
+            </div>
+
+            <!-- Resumo Dinâmico dos Cálculos -->
+            <div class="form-calculation-summary">
+              <div class="calc-item">
+                <span class="calc-label">Dias Restantes</span>
+                <span class="calc-val" id="modal-calc-dias">--</span>
+              </div>
+              <div class="calc-item">
+                <span class="calc-label">Faixa de Alerta</span>
+                <span class="calc-val" id="modal-calc-faixa">--</span>
+              </div>
+              <div class="calc-item">
+                <span class="calc-label">% de Aditivo</span>
+                <span class="calc-val" id="modal-calc-pct">0,00%</span>
+              </div>
+              <div class="calc-item">
+                <span class="calc-label">Saldo de Aditivo</span>
+                <span class="calc-val" id="modal-calc-saldo">R$ 0,00</span>
+              </div>
+              <div class="calc-item">
+                <span class="calc-label">Situação do Limite</span>
+                <span class="calc-val" id="modal-calc-situacao">Regular</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer" style="padding: 14px 0 0 0; margin-top: 16px; background: none; border-top: 1px solid var(--pmto-slate-200);">
+            <button type="button" class="btn btn-secondary" onclick="closeContractModal()">Cancelar</button>
+            <button type="submit" class="btn btn-primary" id="btn-salvar-contrato">Salvar Contrato no Banco</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: GERENCIADOR DE BANCO DE DADOS (GRATUITO) -->
+  <div class="modal-backdrop" id="modal-database-backdrop" role="dialog" aria-modal="true">
+    <div class="modal-dialog" style="max-width: 650px;">
+      <div class="modal-header" style="background: #0F172A;">
+        <h2>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px; color: #10B981;"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+          Gerenciador de Banco de Dados Gratuito
+        </h2>
+        <button class="modal-close-btn" onclick="closeDatabaseModal()">✕</button>
+      </div>
+      <div class="modal-body" style="font-size: 13px; line-height: 1.6;">
+        <div style="background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 6px; padding: 12px 14px; margin-bottom: 16px;">
+          <strong style="color: #065F46; font-size: 14px; display: flex; align-items: center; gap: 6px;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: #10B981; display: inline-block;"></span>
+            Status Atual: <span id="modal-db-provider-name">SQLite Local Integrado (Ativo e Pronto)</span>
+          </strong>
+          <p style="color: #047857; margin-top: 4px; font-size: 12px;">
+            Todos os seus contratos são gravados automaticamente com segurança. Nenhuma configuração adicional é obrigatória!
+          </p>
+        </div>
+
+        <h4 style="color: var(--pmto-navy-primary); font-size: 13.5px; margin-bottom: 6px;">Deseja conectar ao Supabase (PostgreSQL Gratuito na Nuvem)?</h4>
+        <p style="color: var(--pmto-slate-600); font-size: 12px; margin-bottom: 12px;">
+          O Supabase oferece banco de dados PostgreSQL gratuito para sincronização na nuvem e acesso compartilhado por múltiplos policiais ou computadores.
+        </p>
+
+        <form onsubmit="handleSaveSupabaseConfig(event)" style="display: flex; flex-direction: column; gap: 10px;">
+          <div>
+            <label style="font-weight: 600; font-size: 12px; display: block; margin-bottom: 4px;">Supabase Project URL</label>
+            <input type="text" id="supabase-url-input" class="form-control" placeholder="https://seu-projeto.supabase.co">
+          </div>
+          <div>
+            <label style="font-weight: 600; font-size: 12px; display: block; margin-bottom: 4px;">Supabase anon / public key</label>
+            <input type="password" id="supabase-key-input" class="form-control" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6...">
+          </div>
+          <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px;">
+            <button type="submit" class="btn btn-primary" id="btn-conectar-supabase">
+              Conectar à Nuvem Gratuita
+            </button>
+          </div>
+        </form>
+
+        <div style="margin-top: 18px; border-top: 1px solid var(--pmto-slate-200); padding-top: 12px;">
+          <h5 style="font-size: 12px; color: var(--pmto-slate-700); margin-bottom: 6px;">Instruções rápidas para criar o banco gratuito no Supabase:</h5>
+          <ol style="padding-left: 20px; font-size: 11.5px; color: var(--pmto-slate-600); line-height: 1.6;">
+            <li>Acesse <a href="https://supabase.com" target="_blank" style="color: #2563EB; font-weight: 600;">supabase.com</a> e crie uma conta gratuita.</li>
+            <li>Crie um novo projeto (ex: <code>sigec-pmto</code>).</li>
+            <li>Abra o <strong>SQL Editor</strong> e cole o conteúdo do arquivo <code>sql/schema.sql</code> deste projeto.</li>
+            <li>Em <strong>Settings &gt; API</strong>, copie a <em>Project URL</em> e a <em>anon public key</em> e cole acima!</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: COLAR TEXTO MANUALMENTE -->
+  <div class="modal-backdrop" id="modal-paste-backdrop" role="dialog" aria-modal="true">
+    <div class="modal-dialog" style="max-width: 650px;">
+      <div class="modal-header">
+        <h2>Colar Texto do Contrato</h2>
+        <button class="modal-close-btn" onclick="closePasteModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 12.5px; color: var(--pmto-slate-700); margin-bottom: 8px;">
+          Cole o texto copiado de um PDF ou documento para extração imediata:
+        </p>
+        <textarea id="paste-input-textarea" class="paste-modal-textarea" placeholder="Cole aqui o texto completo do contrato..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closePasteModal()">Cancelar</button>
+        <button type="button" class="btn btn-primary" onclick="processPastedText()">Analisar e Preencher</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTÊINER DE TOASTS -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- =========================================================================
+       MOTOR JAVASCRIPT: CLIENTE API COM SUPABASE + SQLITE LOCAL + OCR
+       ========================================================================= -->
+  <script>
+    const STORAGE_KEY = 'SIGEC_PMTO_LOCAL_BACKUP_V1';
+    let contracts = [];
+    let currentExtractedData = null;
+    let pendingFileAttachment = null;
+    let isServerAvailable = true;
+
+    // CDNs de fallback para pdf.js, mammoth.js e tesseract.js
+    const LIBS_CONFIG = {
+      pdfjs: {
+        primary: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
+        fallback: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js',
+        workerPrimary: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
+      },
+      mammoth: {
+        primary: 'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js',
+        fallback: 'https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js'
+      },
+      tesseract: {
+        primary: 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js',
+        fallback: 'https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.0/tesseract.min.js'
+      }
+    };
+
+    /* --------------------------------------------------------------------------
+       COMUNICAÇÃO COM O BANCO DE DADOS (API REST + FALLBACK LOCALSTORAGE)
+       -------------------------------------------------------------------------- */
+    async function checkDatabaseStatus() {
+      try {
+        const res = await fetch('/api/status', { method: 'GET' });
+        if (res.ok) {
+          const data = await res.json();
+          isServerAvailable = true;
+          document.getElementById('db-status-text').textContent = `Banco: ${data.provider === 'supabase' ? 'Supabase Nuvem' : 'SQLite Local (Grátis)'}`;
+          document.getElementById('modal-db-provider-name').textContent = data.providerName;
+          document.getElementById('footer-storage-info').textContent = `Banco de Dados: ${data.providerName} (${data.totalContratos} contratos)`;
+          return true;
+        }
+      } catch (err) {
+        // Modo offline / file://
+        isServerAvailable = false;
+        document.getElementById('db-status-text').textContent = 'Banco: LocalStorage Navegador';
+        document.getElementById('modal-db-provider-name').textContent = 'Navegador Local (Modo Offline / Sem Servidor)';
+        document.getElementById('footer-storage-info').textContent = 'Armazenamento: LocalStorage do Navegador';
+        return false;
+      }
+    }
+
+    async function fetchContractsFromDatabase() {
+      if (isServerAvailable) {
+        try {
+          const res = await fetch('/api/contratos');
+          if (res.ok) {
+            contracts = await res.json();
+            // Salva backup local
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(contracts));
+            return;
+          }
+        } catch (err) {
+          console.warn('Servidor inacessível, recuperando backup do LocalStorage:', err);
+        }
+      }
+
+      // Fallback
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        contracts = JSON.parse(raw);
+      }
+    }
+
+    async function saveContractToDatabase(contractData, isNew) {
+      if (isServerAvailable) {
+        try {
+          const url = isNew ? '/api/contratos' : `/api/contratos/${contractData.id}`;
+          const method = isNew ? 'POST' : 'PUT';
+          const res = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(contractData)
+          });
+          if (res.ok) {
+            const saved = await res.json();
+            return saved;
+          }
+        } catch (err) {
+          console.warn('Falha na gravação remota, gravando no LocalStorage:', err);
+        }
+      }
+
+      // Fallback local
+      if (isNew) {
+        contracts.unshift(contractData);
+      } else {
+        const idx = contracts.findIndex(c => c.id === contractData.id);
+        if (idx !== -1) contracts[idx] = contractData;
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(contracts));
+      return contractData;
+    }
+
+    async function deleteContractFromDatabase(id) {
+      if (isServerAvailable) {
+        try {
+          const res = await fetch(`/api/contratos/${id}`, { method: 'DELETE' });
+          if (res.ok) return true;
+        } catch (err) {
+          console.warn('Erro ao deletar no servidor:', err);
+        }
+      }
+      contracts = contracts.filter(c => c.id !== id);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(contracts));
+      return true;
+    }
+
+    /* --------------------------------------------------------------------------
+       UTILITÁRIOS DE DATA, NÚMERO E MOEDA
+       -------------------------------------------------------------------------- */
+    function getToday() {
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      return now;
+    }
+
+    function formatDateBR(date) {
+      if (!date || isNaN(date.getTime())) return '';
+      const d = String(date.getDate()).padStart(2, '0');
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const y = date.getFullYear();
+      return `${d}/${m}/${y}`;
+    }
+
+    function parseDateBR(dateStr) {
+      if (!dateStr || typeof dateStr !== 'string') return null;
+      const parts = dateStr.trim().split(/[\/\-\.]/);
+      if (parts.length !== 3) return null;
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      let year = parseInt(parts[2], 10);
+      if (year < 100) year += 2000;
+      if (isNaN(day) || isNaN(month) || isNaN(year)) return null;
+      const date = new Date(year, month, day);
+      date.setHours(0, 0, 0, 0);
+      return date;
+    }
+
+    function calculateDaysRemaining(endDateStr) {
+      const endDate = parseDateBR(endDateStr);
+      if (!endDate) return null;
+      const today = getToday();
+      const diffTime = endDate.getTime() - today.getTime();
+      return Math.round(diffTime / (1000 * 60 * 60 * 24));
+    }
+
+    function parseCurrencyBR(valStr) {
+      if (!valStr) return 0;
+      if (typeof valStr === 'number') return valStr;
+      let clean = valStr.toString().replace(/[^\d,\.-]/g, '');
+      if (clean.includes(',')) clean = clean.replace(/\./g, '').replace(',', '.');
+      const num = parseFloat(clean);
+      return isNaN(num) ? 0 : num;
+    }
+
+    function formatCurrencyBR(num) {
+      const val = typeof num === 'number' ? num : parseCurrencyBR(num);
+      return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function formatNumberBR(num) {
+      const val = typeof num === 'number' ? num : parseCurrencyBR(num);
+      return val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function maskDate(input) {
+      let v = input.value.replace(/\D/g, '').slice(0, 8);
+      if (v.length >= 5) input.value = `${v.slice(0, 2)}/${v.slice(2, 4)}/${v.slice(4)}`;
+      else if (v.length >= 3) input.value = `${v.slice(0, 2)}/${v.slice(2)}`;
+      else input.value = v;
+    }
+
+    function maskCurrency(input) {
+      let v = input.value.replace(/\D/g, '');
+      if (!v) { input.value = ''; return; }
+      v = (parseInt(v, 10) / 100).toFixed(2);
+      const parts = v.split('.');
+      const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+      input.value = `${intPart},${parts[1]}`;
+    }
+
+    function getAlertBracket(daysRemaining) {
+      if (daysRemaining === null || daysRemaining === undefined) return { label: 'Sem Data', class: 'badge-secondary' };
+      if (daysRemaining < 0) return { label: 'Vencido', class: 'badge-vencido' };
+      if (daysRemaining <= 30) return { label: 'Crítico (≤30 dias)', class: 'badge-critico' };
+      if (daysRemaining <= 60) return { label: 'Atenção (≤60 dias)', class: 'badge-atencao' };
+      if (daysRemaining <= 90) return { label: 'Monitorar (≤90 dias)', class: 'badge-monitorar' };
+      return { label: 'Regular (>90 dias)', class: 'badge-regular' };
+    }
+
+    function calculateContractMetrics(c) {
+      const diasRestantes = calculateDaysRemaining(c.fimVigencia);
+      const alertBracket = getAlertBracket(diasRestantes);
+
+      const valorInicial = parseCurrencyBR(c.valorInicial);
+      const valorAditivos = parseCurrencyBR(c.valorAditivos);
+      const valorTotal = parseCurrencyBR(c.valorTotal) || (valorInicial + valorAditivos);
+      const valorMensal = parseCurrencyBR(c.valorMensal);
+      const limiteTaxa = parseFloat(c.limiteLegal || '0.25');
+
+      const pctAditivo = valorInicial > 0 ? (valorAditivos / valorInicial) * 100 : 0;
+      const limiteTotalPermitido = valorInicial * limiteTaxa;
+      const saldoAditivo = limiteTotalPermitido - valorAditivos;
+
+      let situacaoLimite = 'Dentro do limite';
+      let situacaoClass = 'badge-regular';
+      if (limiteTotalPermitido > 0) {
+        const ratio = valorAditivos / limiteTotalPermitido;
+        if (ratio > 1.0) { situacaoLimite = 'Excedido'; situacaoClass = 'badge-vencido'; }
+        else if (ratio >= 0.80) { situacaoLimite = 'Próximo do limite'; situacaoClass = 'badge-atencao'; }
+      }
+
+      const diasPreclusao = calculateDaysRemaining(c.prazoPreclusao);
+      let situacaoPreclusao = 'Regular';
+      let preclusaoClass = 'badge-regular';
+      if (diasPreclusao !== null) {
+        if (diasPreclusao < 0) { situacaoPreclusao = 'Precluso'; preclusaoClass = 'badge-vencido'; }
+        else if (diasPreclusao <= 30) { situacaoPreclusao = 'Crítico (≤30d)'; preclusaoClass = 'badge-critico'; }
+        else if (diasPreclusao <= 60) { situacaoPreclusao = 'Atenção (≤60d)'; preclusaoClass = 'badge-atencao'; }
+      }
+
+      const pendencias = [];
+      if (!c.fornecedor || !c.fornecedor.trim()) pendencias.push('Fornecedor ausente');
+      if (!c.fimVigencia || !c.fimVigencia.trim()) pendencias.push('Fim de vigência ausente');
+      if (!c.fiscal || !c.fiscal.trim()) pendencias.push('Fiscal não designado');
+      if (!c.processo || !c.processo.trim()) pendencias.push('Processo ausente');
+      if (!c.contrato || !c.contrato.trim()) pendencias.push('Número do contrato ausente');
+      if (!c.marcoReajuste || !c.marcoReajuste.trim()) pendencias.push('Marco de reajuste ausente');
+
+      return {
+        diasRestantes, alertBracket, valorInicial, valorAditivos, valorTotal, valorMensal,
+        limiteTaxa, pctAditivo, saldoAditivo, situacaoLimite, situacaoClass, diasPreclusao,
+        situacaoPreclusao, preclusaoClass, pendencias
+      };
+    }
+
+    /* --------------------------------------------------------------------------
+       RENDERIZAÇÃO DE TELAS, TABELAS E GRÁFICOS
+       -------------------------------------------------------------------------- */
+    function switchTab(tabId) {
+      document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
+      });
+      document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+
+      const targetBtn = document.getElementById(`tab-btn-${tabId}`);
+      if (targetBtn) {
+        targetBtn.classList.add('active');
+        targetBtn.setAttribute('aria-selected', 'true');
+      }
+
+      const paneEl = document.getElementById(`tab-${tabId}`);
+      if (paneEl) paneEl.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function refreshAllViews() {
+      renderDashboard();
+      renderDashboardCharts();
+      renderContractsTable();
+      renderAlertsTab();
+      renderReajustesTab();
+      updateTabCounters();
+    }
+
+    function updateTabCounters() {
+      let totalAlertas = 0;
+      contracts.forEach(c => {
+        const m = calculateContractMetrics(c);
+        if (m.diasRestantes !== null && m.diasRestantes <= 30) totalAlertas++;
+      });
+      document.getElementById('tab-counter-contratos').textContent = contracts.length;
+      document.getElementById('tab-counter-alertas').textContent = totalAlertas;
+      document.getElementById('tab-counter-reajustes').textContent = contracts.length;
+    }
+
+    function renderDashboard() {
+      let vencidos = 0, critico = 0, atencao = 0, monitorar = 0;
+      let somaMensal = 0, somaTotal = 0, totalPendencias = 0;
+      const pendenciasItems = [];
+
+      const sorted = [...contracts].map(c => ({ ...c, metrics: calculateContractMetrics(c) }))
+        .sort((a, b) => (a.metrics.diasRestantes ?? 9999) - (b.metrics.diasRestantes ?? 9999));
+
+      sorted.forEach(item => {
+        const m = item.metrics;
+        somaMensal += m.valorMensal;
+        somaTotal += m.valorTotal;
+
+        if (m.diasRestantes !== null) {
+          if (m.diasRestantes < 0) vencidos++;
+          else if (m.diasRestantes <= 30) critico++;
+          else if (m.diasRestantes <= 60) atencao++;
+          else if (m.diasRestantes <= 90) monitorar++;
+        }
+
+        if (m.pendencias.length > 0) {
+          totalPendencias += m.pendencias.length;
+          pendenciasItems.push({ id: item.id, contrato: item.contrato || 'S/N', fornecedor: item.fornecedor, pendencias: m.pendencias });
+        }
+      });
+
+      document.getElementById('kpi-total').textContent = contracts.length;
+      document.getElementById('kpi-vencidos').textContent = vencidos;
+      document.getElementById('kpi-critico').textContent = critico;
+      document.getElementById('kpi-atencao').textContent = atencao;
+      document.getElementById('kpi-monitorar').textContent = monitorar;
+      document.getElementById('kpi-soma-mensal').textContent = formatCurrencyBR(somaMensal);
+      document.getElementById('kpi-soma-total').textContent = formatCurrencyBR(somaTotal);
+      document.getElementById('kpi-pendencias').textContent = totalPendencias;
+
+      // Próximos Vencimentos
+      const tbody = document.getElementById('painel-vencimentos-tbody');
+      tbody.innerHTML = '';
+      if (sorted.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--pmto-slate-400);">Nenhum contrato cadastrado.</td></tr>`;
+      } else {
+        sorted.slice(0, 7).forEach(c => {
+          const m = c.metrics;
+          const tr = document.createElement('tr');
+          const diasTexto = m.diasRestantes !== null ? (m.diasRestantes < 0 ? `${m.diasRestantes}d (Atraso)` : `${m.diasRestantes}d`) : '--';
+          tr.innerHTML = `
+            <td><strong style="color: var(--pmto-navy-primary);">${escapeHTML(c.fornecedor)}</strong></td>
+            <td><code>${escapeHTML(c.contrato || 'S/N')}</code></td>
+            <td>${escapeHTML(c.fimVigencia || '--')}</td>
+            <td class="td-num"><strong>${diasTexto}</strong></td>
+            <td><span class="badge ${m.alertBracket.class}">${m.alertBracket.label}</span></td>
+            <td class="td-num">${formatCurrencyBR(m.valorTotal)}</td>
+            <td style="text-align: right;">
+              <button class="btn btn-secondary btn-sm" onclick="openContractModal('${c.id}')">Editar</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // Pendências
+      const listPend = document.getElementById('painel-pendencias-list');
+      document.getElementById('badge-total-pendencias').textContent = `${totalPendencias} pendências`;
+      listPend.innerHTML = '';
+      if (pendenciasItems.length === 0) {
+        listPend.innerHTML = `<div style="text-align: center; padding: 16px; color: #059669; background: #ECFDF5; border-radius: var(--radius-md);">✓ Cadastro completo em todos os contratos!</div>`;
+      } else {
+        pendenciasItems.slice(0, 6).forEach(p => {
+          const item = document.createElement('div');
+          item.className = 'pendencia-item';
+          item.innerHTML = `
+            <div class="pendencia-info">
+              <strong>${escapeHTML(p.contrato)} — ${escapeHTML(p.fornecedor)}</strong>
+              <p>Falta: <span style="color: #DC2626; font-weight: 600;">${escapeHTML(p.pendencias.join(', '))}</span></p>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="openContractModal('${p.id}')">Preencher</button>
+          `;
+          listPend.appendChild(item);
+        });
+      }
+    }
+
+    function renderDashboardCharts() {
+      const badgeTotal = document.getElementById('charts-total-badge');
+      if (badgeTotal) badgeTotal.textContent = `${contracts.length} processos`;
+
+      if (contracts.length === 0) {
+        document.getElementById('chart-faixas-donut-container').innerHTML = '<div style="color:var(--pmto-slate-400); font-size:12px;">Sem dados</div>';
+        return;
+      }
+
+      let vencidos = 0, critico = 0, atencao = 0, monitorar = 0, regular = 0;
+      let valVencidos = 0, valCritico = 0, valAtencao = 0, valMonitorar = 0, valRegular = 0;
+      let totalValor = 0;
+
+      const withMetrics = contracts.map(c => {
+        const m = calculateContractMetrics(c);
+        totalValor += m.valorTotal;
+        if (m.diasRestantes !== null) {
+          if (m.diasRestantes < 0) { vencidos++; valVencidos += m.valorTotal; }
+          else if (m.diasRestantes <= 30) { critico++; valCritico += m.valorTotal; }
+          else if (m.diasRestantes <= 60) { atencao++; valAtencao += m.valorTotal; }
+          else if (m.diasRestantes <= 90) { monitorar++; valMonitorar += m.valorTotal; }
+          else { regular++; valRegular += m.valorTotal; }
+        } else {
+          regular++; valRegular += m.valorTotal;
+        }
+        return { ...c, metrics: m };
+      });
+
+      const totalCount = contracts.length;
+
+      // 1. Donut Chart (SVG)
+      const faixasData = [
+        { label: 'Vencidos', count: vencidos, color: '#DC2626' },
+        { label: 'Crítico', count: critico, color: '#EA580C' },
+        { label: 'Atenção', count: atencao, color: '#D97706' },
+        { label: 'Monitorar', count: monitorar, color: '#2563EB' },
+        { label: 'Regular', count: regular, color: '#16A34A' }
+      ];
+
+      const radius = 58;
+      const strokeWidth = 22;
+      const circ = 2 * Math.PI * radius;
+      let accumulated = 0;
+      let circlesSvg = '';
+
+      faixasData.forEach(f => {
+        if (f.count > 0) {
+          const pct = (f.count / totalCount) * 100;
+          const dash = (pct / 100) * circ;
+          const offset = (accumulated / 100) * circ;
+          circlesSvg += `
+            <circle cx="100" cy="100" r="${radius}" fill="none" stroke="${f.color}" stroke-width="${strokeWidth}"
+              stroke-dasharray="${dash} ${circ - dash}" stroke-dashoffset="-${offset}" style="cursor:pointer;">
+              <title>${f.label}: ${f.count} (${pct.toFixed(0)}%)</title>
+            </circle>
+          `;
+          accumulated += pct;
+        }
+      });
+
+      document.getElementById('chart-faixas-donut-container').innerHTML = `
+        <svg viewBox="0 0 200 200" style="width: 155px; height: 155px; transform: rotate(-90deg);">
+          <circle cx="100" cy="100" r="${radius}" fill="none" stroke="#F1F5F9" stroke-width="${strokeWidth}"></circle>
+          ${circlesSvg}
+        </svg>
+        <div style="position: absolute; text-align: center; pointer-events: none;">
+          <div style="font-size: 22px; font-weight: 800; color: var(--pmto-navy-primary); line-height: 1;">${totalCount}</div>
+          <div style="font-size: 9.5px; font-weight: 700; color: var(--pmto-slate-400); text-transform: uppercase;">Contratos</div>
+        </div>
+      `;
+
+      document.getElementById('chart-faixas-legend').innerHTML = faixasData.map(f => `
+        <div class="chart-legend-item">
+          <span class="chart-legend-dot" style="background-color: ${f.color};"></span>
+          <span><strong>${f.count}</strong> ${f.label}</span>
+        </div>
+      `).join('');
+
+      // 2. Gráfico Financeiro
+      const finBars = [
+        { label: 'Regular (>90d)', valor: valRegular, color: '#16A34A' },
+        { label: 'Monitorar (≤90d)', valor: valMonitorar, color: '#2563EB' },
+        { label: 'Atenção (≤60d)', valor: valAtencao, color: '#D97706' },
+        { label: 'Crítico (≤30d)', valor: valCritico, color: '#EA580C' },
+        { label: 'Vencidos', valor: valVencidos, color: '#DC2626' }
+      ];
+      const maxFin = Math.max(1, ...finBars.map(b => b.valor));
+      document.getElementById('chart-financeiro-bars').innerHTML = finBars.map(b => {
+        const w = totalValor > 0 && b.valor > 0 ? Math.max(5, (b.valor / maxFin) * 100) : 0;
+        return `
+          <div class="bar-chart-row">
+            <div class="bar-chart-label-row">
+              <span style="font-weight: 600; color: var(--pmto-slate-700);">${b.label}</span>
+              <span style="font-weight: 700;">${formatCurrencyBR(b.valor)}</span>
+            </div>
+            <div class="bar-chart-track">
+              <div class="bar-chart-fill" style="width: ${w}%; background-color: ${b.color};"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // 3. Limites de Aditivos
+      let dentro = 0, alerta = 0, excedido = 0;
+      let totalAdit = 0, totalSaldo = 0;
+      withMetrics.forEach(c => {
+        totalAdit += c.metrics.valorAditivos;
+        totalSaldo += Math.max(0, c.metrics.saldoAditivo);
+        if (c.metrics.situacaoLimite === 'Excedido') excedido++;
+        else if (c.metrics.situacaoLimite === 'Próximo do limite') alerta++;
+        else dentro++;
+      });
+      document.getElementById('chart-limites-container').innerHTML = `
+        <div style="font-size: 12px; display: flex; justify-content: space-between; margin-bottom: 4px;">
+          <span><strong>Conformidade Legal:</strong></span>
+          <span><strong>${dentro}</strong> de ${totalCount} dentro do teto</span>
+        </div>
+        <div class="bar-chart-track" style="height: 12px;">
+          <div style="width: ${(dentro/totalCount)*100}%; background-color: #16A34A;" title="Regular: ${dentro}"></div>
+          <div style="width: ${(alerta/totalCount)*100}%; background-color: #D97706;" title="Alerta: ${alerta}"></div>
+          <div style="width: ${(excedido/totalCount)*100}%; background-color: #DC2626;" title="Excedido: ${excedido}"></div>
+        </div>
+        <div style="background: var(--white); border: 1px solid var(--pmto-slate-200); border-radius: 4px; padding: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px;">
+          <div><div style="font-size: 10px; color: var(--pmto-slate-500); font-weight: 600;">TOTAL ADITIVADO</div><div style="font-size: 13px; font-weight: 700; color: #B45309;">${formatCurrencyBR(totalAdit)}</div></div>
+          <div><div style="font-size: 10px; color: var(--pmto-slate-500); font-weight: 600;">SALDO DISPONÍVEL</div><div style="font-size: 13px; font-weight: 700; color: #15803D;">${formatCurrencyBR(totalSaldo)}</div></div>
+        </div>
+      `;
+
+      // 4. Top 5 Contratos
+      const top5 = [...withMetrics].sort((a, b) => b.metrics.valorTotal - a.metrics.valorTotal).slice(0, 5);
+      const maxTop = top5.length > 0 ? top5[0].metrics.valorTotal : 1;
+      document.getElementById('chart-top-contratos-bars').innerHTML = top5.map((c, i) => {
+        const w = Math.max(8, (c.metrics.valorTotal / maxTop) * 100);
+        return `
+          <div class="bar-chart-row">
+            <div class="bar-chart-label-row">
+              <span style="font-weight: 600; color: var(--pmto-navy-primary); max-width: 175px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${i+1}º ${escapeHTML(c.fornecedor)}</span>
+              <span style="font-weight: 700;">${formatCurrencyBR(c.metrics.valorTotal)}</span>
+            </div>
+            <div class="bar-chart-track" style="height: 7px;">
+              <div class="bar-chart-fill" style="width: ${w}%; background: linear-gradient(90deg, var(--pmto-navy-primary), var(--pmto-navy-light));"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterContracts() {
+      renderContractsTable();
+    }
+
+    function renderContractsTable() {
+      const tbody = document.getElementById('contratos-table-tbody');
+      const search = (document.getElementById('contratos-search-input')?.value || '').toLowerCase().trim();
+      const faixa = document.getElementById('contratos-filter-faixa')?.value || 'TODAS';
+      const sort = document.getElementById('contratos-sort-by')?.value || 'dias-asc';
+
+      tbody.innerHTML = '';
+      let filtered = contracts.filter(c => {
+        const text = `${c.fornecedor} ${c.objeto} ${c.processo} ${c.contrato} ${c.fiscal}`.toLowerCase();
+        if (!text.includes(search)) return false;
+        if (faixa !== 'TODAS') {
+          const m = calculateContractMetrics(c);
+          if (m.alertBracket.label !== faixa) return false;
+        }
+        return true;
+      });
+
+      filtered.sort((a, b) => {
+        const ma = calculateContractMetrics(a);
+        const mb = calculateContractMetrics(b);
+        if (sort === 'dias-asc') return (ma.diasRestantes ?? 9999) - (mb.diasRestantes ?? 9999);
+        if (sort === 'dias-desc') return (mb.diasRestantes ?? -9999) - (ma.diasRestantes ?? -9999);
+        if (sort === 'fornecedor-asc') return (a.fornecedor || '').localeCompare(b.fornecedor || '');
+        if (sort === 'valor-desc') return mb.valorTotal - ma.valorTotal;
+        return (a.contrato || '').localeCompare(b.contrato || '');
+      });
+
+      document.getElementById('contratos-count-label').textContent = `Exibindo ${filtered.length} de ${contracts.length} contratos`;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="19" style="text-align: center; padding: 30px; color: var(--pmto-slate-400);">Nenhum contrato encontrado.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(c => {
+        const m = calculateContractMetrics(c);
+        const tr = document.createElement('tr');
+        const diasDisplay = m.diasRestantes !== null ? (m.diasRestantes < 0 ? `<span style="color:#DC2626; font-weight:700;">${m.diasRestantes}d</span>` : `<strong>${m.diasRestantes}d</strong>`) : '--';
+
+        tr.innerHTML = `
+          <td>
+            <div style="font-weight: 700; color: var(--pmto-navy-primary);">${escapeHTML(c.fornecedor || '--')}</div>
+            ${c.cnpj ? `<small style="color: var(--pmto-slate-400); font-family: monospace;">${escapeHTML(c.cnpj)}</small>` : ''}
+          </td>
+          <td><div class="truncate-text" title="${escapeHTML(c.objeto || '')}">${escapeHTML(c.objeto || '--')}</div></td>
+          <td><code style="font-size:11px;">${escapeHTML(c.processo || '--')}</code></td>
+          <td><strong>${escapeHTML(c.contrato || 'S/N')}</strong></td>
+          <td>${escapeHTML(c.aditivoAtual || 'Inicial')}</td>
+          <td>${escapeHTML(c.inicioVigencia || '--')}</td>
+          <td><strong>${escapeHTML(c.fimVigencia || '--')}</strong></td>
+          <td class="td-num">${diasDisplay}</td>
+          <td><span class="badge ${m.alertBracket.class}">${m.alertBracket.label}</span></td>
+          <td class="td-num">${formatCurrencyBR(m.valorMensal)}</td>
+          <td class="td-num"><strong>${formatCurrencyBR(m.valorTotal)}</strong></td>
+          <td class="td-num">${formatCurrencyBR(m.valorInicial)}</td>
+          <td class="td-num">${formatCurrencyBR(m.valorAditivos)}</td>
+          <td class="td-num"><strong>${formatNumberBR(m.pctAditivo)}%</strong></td>
+          <td><small>${m.limiteTaxa === 0.5 ? '50%' : '25%'}</small></td>
+          <td class="td-num">${formatCurrencyBR(m.saldoAditivo)}</td>
+          <td><span class="badge ${m.situacaoClass}">${m.situacaoLimite}</span></td>
+          <td><small>${escapeHTML(c.fiscal || 'Não designado')}</small></td>
+          <td>
+            <div class="table-actions">
+              <button class="action-icon-btn" onclick="openContractModal('${c.id}')" title="Editar">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+              </button>
+              <button class="action-icon-btn btn-delete" onclick="confirmDeleteContract('${c.id}')" title="Excluir">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderAlertsTab() {
+      const container = document.getElementById('alertas-container');
+      container.innerHTML = '';
+
+      const faixas = [
+        { label: 'Contratos Vencidos', banner: 'alert-banner-vencido', filter: m => m.diasRestantes !== null && m.diasRestantes < 0, action: 'Vigência encerrada! Verificar formalização tempestiva de prorrogação ou encerramento definitivo.' },
+        { label: 'Faixa Crítica (≤ 30 dias)', banner: 'alert-banner-critico', filter: m => m.diasRestantes !== null && m.diasRestantes >= 0 && m.diasRestantes <= 30, action: 'Urgência máxima! Despachar minuta para parecer jurídico e assinatura do Comando Geral.' },
+        { label: 'Faixa de Atenção (31 a 60 dias)', banner: 'alert-banner-atencao', filter: m => m.diasRestantes !== null && m.diasRestantes > 30 && m.diasRestantes <= 60, action: 'Notificar contratada para manifestação de interesse e realizar pesquisa de preços de mercado.' },
+        { label: 'Faixa de Monitoramento (61 a 90 dias)', banner: 'alert-banner-monitorar', filter: m => m.diasRestantes !== null && m.diasRestantes > 60 && m.diasRestantes <= 90, action: 'Solicitar relatório circunstanciado ao fiscal do contrato sobre a continuidade do serviço.' },
+        { label: 'Faixa Regular (> 90 dias)', banner: 'alert-banner-regular', filter: m => m.diasRestantes !== null && m.diasRestantes > 90, action: 'Acompanhamento normal das medições, notas fiscais e encargos trabalhistas.' }
+      ];
+
+      faixas.forEach(f => {
+        const list = contracts.filter(c => f.filter(calculateContractMetrics(c)));
+        const group = document.createElement('div');
+        group.className = 'alert-group';
+        group.innerHTML = `
+          <div class="alert-banner ${f.banner}">
+            <div class="alert-banner-text">
+              <h3>${f.label} (${list.length} contratos)</h3>
+              <p><strong>Ação recomendada:</strong> ${f.action}</p>
+            </div>
+          </div>
+          <div class="alert-contracts-list">
+            ${list.length === 0 ? '<div style="padding:10px; font-size:12px; color:var(--pmto-slate-400); font-style:italic;">Nenhum contrato nesta faixa.</div>' : ''}
+          </div>
+        `;
+        const listEl = group.querySelector('.alert-contracts-list');
+        list.forEach(c => {
+          const m = calculateContractMetrics(c);
+          const card = document.createElement('div');
+          card.className = 'alert-contract-card';
+          card.innerHTML = `
+            <div>
+              <strong style="color: var(--pmto-navy-primary);">${escapeHTML(c.fornecedor)}</strong>
+              <div style="font-size: 11.5px; color: var(--pmto-slate-600);">Contrato: <strong>${escapeHTML(c.contrato || 'S/N')}</strong> &bull; Fim: ${escapeHTML(c.fimVigencia)}</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span class="badge ${m.alertBracket.class}">${m.diasRestantes} dias</span>
+              <button class="btn btn-secondary btn-sm" onclick="openContractModal('${c.id}')">Gerenciar</button>
+            </div>
+          `;
+          listEl.appendChild(card);
+        });
+        container.appendChild(group);
+      });
+    }
+
+    function renderReajustesTab() {
+      const tbody = document.getElementById('reajustes-table-tbody');
+      tbody.innerHTML = '';
+      if (contracts.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 25px; color: var(--pmto-slate-400);">Sem contratos cadastrados.</td></tr>`;
+        return;
+      }
+
+      contracts.forEach(c => {
+        const m = calculateContractMetrics(c);
+        const tr = document.createElement('tr');
+        const diasText = m.diasPreclusao !== null ? (m.diasPreclusao < 0 ? `<span style="color:#DC2626; font-weight:700;">${m.diasPreclusao}d (Precluso)</span>` : `<strong>${m.diasPreclusao}d</strong>`) : '--';
+        tr.innerHTML = `
+          <td><strong>${escapeHTML(c.fornecedor)}</strong></td>
+          <td><code>${escapeHTML(c.contrato || 'S/N')}</code></td>
+          <td><div class="truncate-text">${escapeHTML(c.objeto || '--')}</div></td>
+          <td>${escapeHTML(c.marcoReajuste || '--')}</td>
+          <td><strong>${escapeHTML(c.prazoPreclusao || '--')}</strong></td>
+          <td class="td-num">${diasText}</td>
+          <td><span class="badge ${m.preclusaoClass}">${m.situacaoPreclusao}</span></td>
+          <td style="text-align: right;"><button class="btn btn-secondary btn-sm" onclick="openContractModal('${c.id}')">Editar</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* --------------------------------------------------------------------------
+       FORMULÁRIO MODAL
+       -------------------------------------------------------------------------- */
+    function openContractModal(id = null) {
+      document.getElementById('contract-form').reset();
+      discardExtraction();
+      pendingFileAttachment = null;
+      document.getElementById('current-attachment-display').style.display = 'none';
+
+      if (id) {
+        const c = contracts.find(x => x.id === id);
+        if (c) {
+          document.getElementById('modal-title-text').textContent = `Editar Contrato nº ${c.contrato || 'S/N'}`;
+          document.getElementById('contract-id').value = c.id;
+          document.getElementById('field-fornecedor').value = c.fornecedor || '';
+          document.getElementById('field-objeto').value = c.objeto || '';
+          document.getElementById('field-processo').value = c.processo || '';
+          document.getElementById('field-contrato').value = c.contrato || '';
+          document.getElementById('field-aditivo-atual').value = c.aditivoAtual || '';
+          document.getElementById('field-qtd-aditivos').value = c.qtdAditivos ?? 0;
+          document.getElementById('field-inicio-vigencia').value = c.inicioVigencia || '';
+          document.getElementById('field-fim-vigencia').value = c.fimVigencia || '';
+          document.getElementById('field-valor-mensal').value = c.valorMensal || '';
+          document.getElementById('field-valor-total').value = c.valorTotal || '';
+          document.getElementById('field-valor-inicial').value = c.valorInicial || '';
+          document.getElementById('field-valor-aditivos').value = c.valorAditivos || '';
+          document.getElementById('field-limite-legal').value = c.limiteLegal || '0.25';
+          document.getElementById('field-fiscal').value = c.fiscal || '';
+          document.getElementById('field-marco-reajuste').value = c.marcoReajuste || '';
+          document.getElementById('field-prazo-preclusao').value = c.prazoPreclusao || '';
+          document.getElementById('field-observacoes').value = c.observacoes || '';
+        }
+      } else {
+        document.getElementById('modal-title-text').textContent = 'Cadastrar Novo Contrato';
+        document.getElementById('contract-id').value = '';
+        document.getElementById('field-qtd-aditivos').value = '0';
+        document.getElementById('field-limite-legal').value = '0.25';
+      }
+
+      document.getElementById('modal-contrato-backdrop').classList.add('active');
+      updateLiveCalculations();
+    }
+
+    function closeContractModal() {
+      document.getElementById('modal-contrato-backdrop').classList.remove('active');
+    }
+
+    function updateLiveCalculations() {
+      const fim = document.getElementById('field-fim-vigencia').value;
+      const vIni = parseCurrencyBR(document.getElementById('field-valor-inicial').value);
+      const vAdit = parseCurrencyBR(document.getElementById('field-valor-aditivos').value);
+      const limTaxa = parseFloat(document.getElementById('field-limite-legal').value || '0.25');
+
+      const dias = calculateDaysRemaining(fim);
+      const alert = getAlertBracket(dias);
+      const pct = vIni > 0 ? (vAdit / vIni) * 100 : 0;
+      const saldo = (vIni * limTaxa) - vAdit;
+
+      document.getElementById('modal-calc-dias').textContent = dias !== null ? `${dias} dias` : '--';
+      document.getElementById('modal-calc-faixa').innerHTML = `<span class="badge ${alert.class}">${alert.label}</span>`;
+      document.getElementById('modal-calc-pct').textContent = `${formatNumberBR(pct)}%`;
+      document.getElementById('modal-calc-saldo').textContent = formatCurrencyBR(saldo);
+      document.getElementById('modal-calc-situacao').textContent = saldo >= 0 ? 'Dentro do limite' : 'Excedido';
+    }
+
+    function checkSuggestedLimitFromObject() {
+      const text = (document.getElementById('field-objeto').value || '').toLowerCase();
+      if (text.includes('reforma') || text.includes('edifica') || text.includes('equipamento') || text.includes('obra')) {
+        document.getElementById('field-limite-legal').value = '0.50';
+      } else {
+        document.getElementById('field-limite-legal').value = '0.25';
+      }
+      updateLiveCalculations();
+    }
+
+    async function saveContract(event) {
+      event.preventDefault();
+      const fornecedor = document.getElementById('field-fornecedor').value.trim();
+      const fimVigencia = document.getElementById('field-fim-vigencia').value.trim();
+
+      if (!fornecedor || !fimVigencia) {
+        showToast('Preencha os campos obrigatórios (Fornecedor e Fim de Vigência)', 'toast-error');
+        return;
+      }
+
+      const id = document.getElementById('contract-id').value;
+      const isNew = !id;
+
+      const record = {
+        id: isNew ? ('pmto-' + Date.now()) : id,
+        fornecedor,
+        objeto: document.getElementById('field-objeto').value.trim(),
+        processo: document.getElementById('field-processo').value.trim(),
+        contrato: document.getElementById('field-contrato').value.trim(),
+        aditivoAtual: document.getElementById('field-aditivo-atual').value.trim(),
+        qtdAditivos: parseInt(document.getElementById('field-qtd-aditivos').value || '0', 10),
+        inicioVigencia: document.getElementById('field-inicio-vigencia').value.trim(),
+        fimVigencia,
+        valorMensal: document.getElementById('field-valor-mensal').value.trim(),
+        valorTotal: document.getElementById('field-valor-total').value.trim(),
+        valorInicial: document.getElementById('field-valor-inicial').value.trim(),
+        valorAditivos: document.getElementById('field-valor-aditivos').value.trim(),
+        limiteLegal: document.getElementById('field-limite-legal').value,
+        fiscal: document.getElementById('field-fiscal').value.trim(),
+        marcoReajuste: document.getElementById('field-marco-reajuste').value.trim(),
+        prazoPreclusao: document.getElementById('field-prazo-preclusao').value.trim(),
+        observacoes: document.getElementById('field-observacoes').value.trim(),
+        attachmentName: pendingFileAttachment?.name || null
+      };
+
+      await saveContractToDatabase(record, isNew);
+      closeContractModal();
+      await fetchContractsFromDatabase();
+      refreshAllViews();
+      showToast(isNew ? '✓ Contrato salvo com sucesso no banco de dados!' : '✓ Contrato atualizado no banco!', 'toast-success');
+    }
+
+    async function confirmDeleteContract(id) {
+      if (confirm('Confirma a exclusão deste contrato do banco de dados?')) {
+        await deleteContractFromDatabase(id);
+        await fetchContractsFromDatabase();
+        refreshAllViews();
+        showToast('Contrato excluído.', 'toast-warning');
+      }
+    }
+
+    /* --------------------------------------------------------------------------
+       MODAL DE BANCO DE DADOS (SUPABASE / SQLITE)
+       -------------------------------------------------------------------------- */
+    function openDatabaseModal() {
+      document.getElementById('modal-database-backdrop').classList.add('active');
+    }
+
+    function closeDatabaseModal() {
+      document.getElementById('modal-database-backdrop').classList.remove('active');
+    }
+
+    async function handleSaveSupabaseConfig(e) {
+      e.preventDefault();
+      const url = document.getElementById('supabase-url-input').value.trim();
+      const key = document.getElementById('supabase-key-input').value.trim();
+
+      if (!url || !key) {
+        showToast('Preencha a URL e a Anon Key do Supabase.', 'toast-error');
+        return;
+      }
+
+      showToast('Testando conexão com o Supabase...', 'toast-warning');
+      try {
+        const res = await fetch('/api/config-supabase', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url, key })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast('✓ Conexão com Supabase estabelecida com sucesso!', 'toast-success');
+          closeDatabaseModal();
+          await checkDatabaseStatus();
+          await fetchContractsFromDatabase();
+          refreshAllViews();
+        } else {
+          showToast(`Erro: ${data.error || 'Falha ao conectar'}`, 'toast-error');
+        }
+      } catch (err) {
+        showToast('Erro ao comunicar com o servidor: ' + err.message, 'toast-error');
+      }
+    }
+
+    async function confirmResetSampleData() {
+      if (confirm('Deseja recarregar os contratos de exemplo da PMTO no banco de dados?')) {
+        try {
+          const res = await fetch('/api/reset-sample', { method: 'POST' });
+          if (res.ok) {
+            await fetchContractsFromDatabase();
+            refreshAllViews();
+            showToast('✓ Dados padrão da PMTO restaurados no banco!', 'toast-success');
+          }
+        } catch (err) {
+          showToast('Erro ao restaurar dados.', 'toast-error');
+        }
+      }
+    }
+
+    /* --------------------------------------------------------------------------
+       LEITURA DE ARQUIVOS E EXTRAÇÃO AUTOMÁTICA
+       -------------------------------------------------------------------------- */
+    function triggerFileInput() { document.getElementById('contract-file-input').click(); }
+    function handleDragOver(e) { e.preventDefault(); document.getElementById('dropzone-box').classList.add('dragover'); }
+    function handleDragLeave(e) { e.preventDefault(); document.getElementById('dropzone-box').classList.remove('dragover'); }
+    function handleFileDrop(e) {
+      e.preventDefault();
+      document.getElementById('dropzone-box').classList.remove('dragover');
+      if (e.dataTransfer?.files?.length) handleFileSelected(e.dataTransfer.files);
+    }
+
+    function handleFileSelected(files) {
+      if (!files || !files.length) return;
+      const file = files[0];
+      const ext = '.' + file.name.split('.').pop().toLowerCase();
+      pendingFileAttachment = { name: file.name, size: file.size, type: file.type };
+
+      document.getElementById('attached-filename-text').textContent = file.name;
+      document.getElementById('current-attachment-display').style.display = 'inline-flex';
+
+      showExtractionProgress('Lendo documento...', 20);
+      if (ext === '.txt') {
+        const r = new FileReader();
+        r.onload = e => processExtractedText(e.target.result);
+        r.readAsText(file);
+      } else if (ext === '.pdf') {
+        readPdf(file);
+      } else {
+        hideExtractionProgress();
+        showToast('Arquivo anexado. Você pode colar o texto para preenchimento automático.', 'toast-warning');
+      }
+    }
+
+    async function readPdf(file) {
+      try {
+        if (!window.pdfjsLib) {
+          showExtractionProgress('Carregando leitor de PDF...', 30);
+          await loadScript(LIBS_CONFIG.pdfjs.primary);
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc = LIBS_CONFIG.pdfjs.workerPrimary;
+        }
+        showExtractionProgress('Extraindo texto...', 50);
+        const reader = new FileReader();
+        reader.onload = async function() {
+          const typedarray = new Uint8Array(this.result);
+          const pdf = await window.pdfjsLib.getDocument({ data: typedarray }).promise;
+          let text = '';
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            text += content.items.map(it => it.str).join(' ') + '\n';
+          }
+          processExtractedText(text);
+        };
+        reader.readAsArrayBuffer(file);
+      } catch (err) {
+        hideExtractionProgress();
+        showToast('Abra o modo de colagem manual para inserir o texto.', 'toast-warning');
+        openPasteModal();
+      }
+    }
+
+    function loadScript(src) {
+      return new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = res;
+        s.onerror = rej;
+        document.head.appendChild(s);
+      });
+    }
+
+    function showExtractionProgress(status, pct) {
+      const b = document.getElementById('extraction-progress-box');
+      b.style.display = 'block';
+      document.getElementById('extraction-progress-fill').style.width = `${pct}%`;
+      document.getElementById('extraction-progress-status').textContent = status;
+      document.getElementById('extraction-progress-percent').textContent = `${pct}%`;
+    }
+
+    function hideExtractionProgress() {
+      document.getElementById('extraction-progress-box').style.display = 'none';
+    }
+
+    function processExtractedText(rawText) {
+      hideExtractionProgress();
+      const text = (rawText || '').trim();
+      document.getElementById('extracted-text-panel').style.display = 'block';
+      document.getElementById('extracted-text-preview').textContent = text;
+      document.getElementById('extracted-char-count').textContent = text.length;
+
+      // Motor de RegEx
+      const extracted = {
+        fornecedor: (/contratad[ao]\s*[:\-]\s*([A-Za-zÀ-ÿ0-9\s\.\-&]{3,80})/i.exec(text)?.[1] || '').trim(),
+        contrato: (/contrato\s*(?:n[º°\.]?)?\s*([0-9]{1,5}\/[0-9]{4})/i.exec(text)?.[1] || '').trim(),
+        processo: (/processo\s*(?:sei|nup)?\s*[:\-]?\s*([0-9\.\/\-]+)/i.exec(text)?.[1] || '').trim(),
+        objeto: (/objeto\s*[:\-]\s*([A-Za-zÀ-ÿ0-9\s,\.\-]{15,400})/i.exec(text)?.[1] || '').trim(),
+        valorTotal: (/R\$\s*([0-9]{1,3}(?:\.[0-9]{3})*,[0-9]{2})/i.exec(text)?.[1] || '').trim(),
+        fimVigencia: (/\b([0-3]?[0-9][\/\-][0-1]?[0-9][\/\-]202[5-9])\b/.exec(text)?.[1] || '').trim()
+      };
+
+      currentExtractedData = extracted;
+      const reviewEl = document.getElementById('extracted-fields-review-list');
+      reviewEl.innerHTML = '';
+
+      Object.entries(extracted).forEach(([k, v]) => {
+        if (v) {
+          const row = document.createElement('div');
+          row.className = 'extracted-field-row';
+          row.innerHTML = `<span class="extracted-field-name">${k}:</span><span class="extracted-field-val">${escapeHTML(v)}</span><span class="confidence-badge confidence-high">Alta</span>`;
+          reviewEl.appendChild(row);
+        }
+      });
+
+      document.getElementById('extraction-review-panel').style.display = 'block';
+      applyExtractedDataToForm();
+      showToast('✓ Dados extraídos com sucesso do documento!', 'toast-success');
+    }
+
+    function applyExtractedDataToForm() {
+      if (!currentExtractedData) return;
+      const d = currentExtractedData;
+      if (d.fornecedor) document.getElementById('field-fornecedor').value = d.fornecedor;
+      if (d.contrato) document.getElementById('field-contrato').value = d.contrato;
+      if (d.processo) document.getElementById('field-processo').value = d.processo;
+      if (d.objeto) document.getElementById('field-objeto').value = d.objeto;
+      if (d.valorTotal) {
+        document.getElementById('field-valor-total').value = d.valorTotal;
+        document.getElementById('field-valor-inicial').value = d.valorTotal;
+      }
+      if (d.fimVigencia) document.getElementById('field-fim-vigencia').value = d.fimVigencia;
+      updateLiveCalculations();
+    }
+
+    function discardExtraction() {
+      currentExtractedData = null;
+      document.getElementById('extraction-review-panel').style.display = 'none';
+      document.getElementById('extracted-text-panel').style.display = 'none';
+      hideExtractionProgress();
+    }
+
+    function toggleExtractedTextPanel() {
+      const p = document.getElementById('extracted-text-panel');
+      p.style.display = p.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function copyExtractedText() {
+      navigator.clipboard.writeText(document.getElementById('extracted-text-preview').textContent || '');
+      showToast('Texto copiado!', 'toast-success');
+    }
+
+    function openPasteModal() { document.getElementById('modal-paste-backdrop').classList.add('active'); }
+    function closePasteModal() { document.getElementById('modal-paste-backdrop').classList.remove('active'); }
+    function processPastedText() {
+      const t = document.getElementById('paste-input-textarea').value;
+      if (t) {
+        closePasteModal();
+        processExtractedText(t);
+      }
+    }
+
+    function removeAttachedFile() {
+      pendingFileAttachment = null;
+      document.getElementById('current-attachment-display').style.display = 'none';
+    }
+
+    /* --------------------------------------------------------------------------
+       EXPORTAÇÃO E BACKUP
+       -------------------------------------------------------------------------- */
+    function exportContractsCSV() {
+      if (!contracts.length) { showToast('Nenhum contrato para exportar.', 'toast-warning'); return; }
+      const headers = ['Fornecedor', 'Contrato', 'Processo', 'Fim Vigência', 'Dias Restantes', 'Faixa', 'Valor Total', 'Valor Mensal', 'Fiscal', 'Objeto'];
+      const rows = contracts.map(c => {
+        const m = calculateContractMetrics(c);
+        return [
+          `"${c.fornecedor || ''}"`, `"${c.contrato || ''}"`, `"${c.processo || ''}"`, `"${c.fimVigencia || ''}"`,
+          m.diasRestantes ?? '', `"${m.alertBracket.label}"`, `"${c.valorTotal || ''}"`, `"${c.valorMensal || ''}"`,
+          `"${c.fiscal || ''}"`, `"${(c.objeto || '').replace(/"/g, '""')}"`
+        ];
+      });
+
+      const csv = '\uFEFF' + headers.join(';') + '\n' + rows.map(r => r.join(';')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `SIGEC_PMTO_Contratos_${formatDateBR(getToday()).replace(/\//g, '-')}.csv`;
+      a.click();
+      showToast('Planilha CSV gerada!', 'toast-success');
+    }
+
+    function exportContractsJSON() {
+      const blob = new Blob([JSON.stringify(contracts, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `SIGEC_PMTO_Backup_${formatDateBR(getToday()).replace(/\//g, '-')}.json`;
+      a.click();
+      showToast('Backup JSON gerado!', 'toast-success');
+    }
+
+    function triggerImportJSON() { document.getElementById('import-json-file-input').click(); }
+    function handleImportJSON(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (Array.isArray(imported)) {
+            for (const c of imported) {
+              await saveContractToDatabase(c, true);
+            }
+            await fetchContractsFromDatabase();
+            refreshAllViews();
+            showToast(`✓ ${imported.length} contratos importados para o banco!`, 'toast-success');
+          }
+        } catch (err) {
+          showToast('Arquivo JSON inválido.', 'toast-error');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function showToast(msg, type = 'toast-success') {
+      const box = document.getElementById('toast-container');
+      const t = document.createElement('div');
+      t.className = `toast ${type}`;
+      t.innerHTML = `<span style="flex:1;">${escapeHTML(msg)}</span><button style="border:none;background:none;color:#FFF;cursor:pointer;" onclick="this.parentElement.remove()">✕</button>`;
+      box.appendChild(t);
+      setTimeout(() => t.remove(), 4000);
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    /* INICIALIZAÇÃO */
+    document.addEventListener('DOMContentLoaded', async () => {
+      const today = getToday();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById('header-today-date').textContent = `${formatDateBR(today)} (${today.toLocaleDateString('pt-BR', options)})`;
+
+      await checkDatabaseStatus();
+      await fetchContractsFromDatabase();
+      refreshAllViews();
+    });
+  </script>
+</body>
+</html>
