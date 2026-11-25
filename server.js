@@ -1,6 +1,6 @@
 // ============================================================================
-// SIGEC PMTO - Servidor Web & API com Banco de Dados Gratuito
-// Suporta: SQLite Local Integrado (Zero Config) + Supabase (PostgreSQL Nuvem Grátis)
+// SIGEC PMTO - Servidor Backend REST API
+// Polícia Militar do Estado do Tocantins
 // ============================================================================
 
 require('dotenv').config();
@@ -31,7 +31,7 @@ if (!fs.existsSync(DB_DIR)) {
 const DB_FILE = process.env.VERCEL ? path.join('/tmp', 'sigec_pmto.db') : path.join(DB_DIR, 'sigec_pmto.db');
 const localDb = new DatabaseSync(DB_FILE);
 
-// Criar tabela se não existir
+// Criar tabela se não existir (SEM NENHUM DADO FICTÍCIO)
 localDb.exec(`
   CREATE TABLE IF NOT EXISTS contratos (
     id TEXT PRIMARY KEY,
@@ -59,199 +59,6 @@ localDb.exec(`
     updatedAt TEXT
   );
 `);
-
-// Dados padrão de exemplo da PMTO
-const SAMPLE_CONTRACTS = [
-  {
-    id: 'pmto-sample-01',
-    fornecedor: 'TOCANTINS LOCADORA DE FROTAS E VEÍCULOS LTDA',
-    cnpj: '18.452.964/0001-32',
-    objeto: 'Prestação de serviços contínuos de locação de 60 viaturas policiais caracterizadas e descaracterizadas, tipo SUV e pick-up 4x4, com manutenção preventiva e corretiva integral.',
-    processo: '2026.02847.00124/PMTO',
-    contrato: '018/2025',
-    aditivoAtual: '1º Termo Aditivo',
-    qtdAditivos: 1,
-    inicioVigencia: '02/01/2025',
-    fimVigencia: '18/12/2026',
-    valorMensal: '145.000,00',
-    valorTotal: '1.740.000,00',
-    valorInicial: '1.740.000,00',
-    valorAditivos: '0,00',
-    limiteLegal: '0.25',
-    fiscal: 'Cap PM Marcos Vinícius Matos - Matr. 384.219-1',
-    marcoReajuste: '15/12/2024',
-    prazoPreclusao: '09/12/2026',
-    observacoes: 'Minuta de prorrogação em análise na Assessoria Jurídica da PMTO.',
-    attachmentName: 'Contrato_018_2025_Locacao_Viaturas.pdf',
-    attachmentData: null
-  },
-  {
-    id: 'pmto-sample-02',
-    fornecedor: 'CONFECÇÕES E FARDAMENTOS MILITARES DO BRASIL S/A',
-    cnpj: '04.128.552/0001-90',
-    objeto: 'Aquisição de conjuntos de uniformes operacionais camuflados e fardamento de passeio para o efetivo da Polícia Militar do Estado do Tocantins.',
-    processo: '2025.01994.00892/PMTO',
-    contrato: '034/2025',
-    aditivoAtual: 'Contrato Inicial',
-    qtdAditivos: 0,
-    inicioVigencia: '10/04/2025',
-    fimVigencia: '15/01/2027',
-    valorMensal: '0,00',
-    valorTotal: '890.000,00',
-    valorInicial: '890.000,00',
-    valorAditivos: '0,00',
-    limiteLegal: '0.25',
-    fiscal: 'Maj PM Roberto Carlos Dias - Matr. 210.455-8',
-    marcoReajuste: '10/04/2025',
-    prazoPreclusao: '08/01/2027',
-    observacoes: 'Recebimento definitivo do 2º lote pendente de conferência da comissão técnica.',
-    attachmentName: 'CT_034_2025_Fardamento_PMTO.pdf',
-    attachmentData: null
-  },
-  {
-    id: 'pmto-sample-03',
-    fornecedor: 'DEFESA TÁTICA & MANUTENÇÃO BÉLICA ESPECIALIZADA LTDA',
-    cnpj: '09.341.221/0001-44',
-    objeto: 'Serviços de reforma, modernização, calibração e manutenção corretiva de equipamento e armamento policial institucional (pistolas, fuzis e espingardas).',
-    processo: '2025.04412.00031/PMTO',
-    contrato: '007/2025',
-    aditivoAtual: '2º Termo Aditivo',
-    qtdAditivos: 2,
-    inicioVigencia: '15/02/2025',
-    fimVigencia: '06/12/2026',
-    valorMensal: '28.500,00',
-    valorTotal: '450.000,00',
-    valorInicial: '320.000,00',
-    valorAditivos: '130.000,00',
-    limiteLegal: '0.50',
-    fiscal: '1º Ten PM Alexandre Ribeiro - Matr. 402.115-3',
-    marcoReajuste: '15/02/2025',
-    prazoPreclusao: '29/11/2026',
-    observacoes: 'Limite legal de 50% aplicável por se tratar de manutenção e reforma de equipamento bélico.',
-    attachmentName: 'Contrato_007_2025_Manutencao_Belica.pdf',
-    attachmentData: null
-  },
-  {
-    id: 'pmto-sample-04',
-    fornecedor: 'ENGECONS CONSTRUÇÕES E ENGENHARIA LTDA',
-    cnpj: '24.908.112/0001-77',
-    objeto: 'Execução de obras de reforma geral, reforço estrutural e adequação predial do complexo do 1º Batalhão da PMTO em Palmas.',
-    processo: '2025.00841.00223/PMTO',
-    contrato: '052/2025',
-    aditivoAtual: '1º Termo Aditivo',
-    qtdAditivos: 1,
-    inicioVigencia: '01/06/2025',
-    fimVigencia: '23/05/2027',
-    valorMensal: '0,00',
-    valorTotal: '1.420.000,00',
-    valorInicial: '1.200.000,00',
-    valorAditivos: '220.000,00',
-    limiteLegal: '0.50',
-    fiscal: 'Cap PM Engenheiro Danielle Souza - Matr. 501.992-0',
-    marcoReajuste: '01/06/2025',
-    prazoPreclusao: '03/05/2027',
-    observacoes: 'Medição da 4ª etapa atestada. Saldo de aditivo confortável.',
-    attachmentName: 'CT_052_Reforma_1BPM_Palmas.pdf',
-    attachmentData: null
-  },
-  {
-    id: 'pmto-sample-05',
-    fornecedor: 'TELECOM TOCANTINS CONECTIVIDADE E FIBRA S/A',
-    cnpj: '03.882.109/0001-18',
-    objeto: 'Prestação de serviços de comunicação multimídia, links dedicados de internet em fibra óptica e rede corporativa IP para 42 destacamentos da PMTO.',
-    processo: '2024.01189.00441/PMTO',
-    contrato: '011/2024',
-    aditivoAtual: '3º Termo Aditivo',
-    qtdAditivos: 3,
-    inicioVigencia: '10/11/2024',
-    fimVigencia: '16/11/2026',
-    valorMensal: '42.000,00',
-    valorTotal: '504.000,00',
-    valorInicial: '504.000,00',
-    valorAditivos: '0,00',
-    limiteLegal: '0.25',
-    fiscal: 'Subten PM Gilberto Arruda - Matr. 189.702-4',
-    marcoReajuste: '10/11/2024',
-    prazoPreclusao: '16/11/2026',
-    observacoes: 'URGENTE: Contrato com termo final expirado. Verificar se houve assinatura prévia do 4º TA.',
-    attachmentName: 'CT_011_2024_Link_Internet.pdf',
-    attachmentData: null
-  },
-  {
-    id: 'pmto-sample-06',
-    fornecedor: 'PETRO DISTRIBUIDORA E DERIVADOS DO TOCANTINS LTDA',
-    cnpj: '01.774.320/0001-05',
-    objeto: 'Fornecimento contínuo e abastecimento descentralizado de combustíveis (gasolina comum e óleo diesel S-10) por meio de cartão magnético inteligente.',
-    processo: '2025.03310.00078/PMTO',
-    contrato: '025/2025',
-    aditivoAtual: 'Contrato Inicial',
-    qtdAditivos: 0,
-    inicioVigencia: '18/03/2025',
-    fimVigencia: '06/02/2027',
-    valorMensal: '210.000,00',
-    valorTotal: '2.520.000,00',
-    valorInicial: '2.520.000,00',
-    valorAditivos: '0,00',
-    limiteLegal: '0.25',
-    fiscal: '',
-    marcoReajuste: '18/03/2025',
-    prazoPreclusao: '23/01/2027',
-    observacoes: 'Aguardando publicação em diário oficial da portaria de designação do novo fiscal.',
-    attachmentName: 'CT_025_Combustiveis_PMTO.pdf',
-    attachmentData: null
-  }
-];
-
-function seedLocalDbIfEmpty() {
-  const countStmt = localDb.prepare('SELECT COUNT(*) AS total FROM contratos');
-  const result = countStmt.get();
-  if (result.total === 0) {
-    const insertStmt = localDb.prepare(`
-      INSERT INTO contratos (
-        id, fornecedor, cnpj, objeto, processo, contrato, aditivoAtual, qtdAditivos,
-        inicioVigencia, fimVigencia, valorMensal, valorTotal, valorInicial, valorAditivos,
-        limiteLegal, fiscal, marcoReajuste, prazoPreclusao, observacoes, attachmentName,
-        attachmentData, createdAt, updatedAt
-      ) VALUES (
-        @id, @fornecedor, @cnpj, @objeto, @processo, @contrato, @aditivoAtual, @qtdAditivos,
-        @inicioVigencia, @fimVigencia, @valorMensal, @valorTotal, @valorInicial, @valorAditivos,
-        @limiteLegal, @fiscal, @marcoReajuste, @prazoPreclusao, @observacoes, @attachmentName,
-        @attachmentData, @createdAt, @updatedAt
-      )
-    `);
-
-    const now = new Date().toISOString();
-    for (const c of SAMPLE_CONTRACTS) {
-      insertStmt.run({
-        id: c.id,
-        fornecedor: c.fornecedor,
-        cnpj: c.cnpj || null,
-        objeto: c.objeto || null,
-        processo: c.processo || null,
-        contrato: c.contrato || null,
-        aditivoAtual: c.aditivoAtual || 'Contrato Inicial',
-        qtdAditivos: c.qtdAditivos || 0,
-        inicioVigencia: c.inicioVigencia || null,
-        fimVigencia: c.fimVigencia || null,
-        valorMensal: c.valorMensal || '0,00',
-        valorTotal: c.valorTotal || '0,00',
-        valorInicial: c.valorInicial || '0,00',
-        valorAditivos: c.valorAditivos || '0,00',
-        limiteLegal: c.limiteLegal || '0.25',
-        fiscal: c.fiscal || null,
-        marcoReajuste: c.marcoReajuste || null,
-        prazoPreclusao: c.prazoPreclusao || null,
-        observacoes: c.observacoes || null,
-        attachmentName: c.attachmentName || null,
-        attachmentData: c.attachmentData || null,
-        createdAt: now,
-        updatedAt: now
-      });
-    }
-    console.log('[Banco SQLite] 6 contratos de exemplo da PMTO inseridos.');
-  }
-}
-seedLocalDbIfEmpty();
 
 // ----------------------------------------------------------------------------
 // 2. CONEXÃO OPCIONAL COM SUPABASE (POSTGRESQL GRATUITO NA NUVEM)
@@ -295,16 +102,30 @@ initSupabase(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 // ----------------------------------------------------------------------------
 
 // Status do Banco de Dados
-app.get('/api/status', (req, res) => {
+app.get('/api/status', async (req, res) => {
   try {
-    const countRow = localDb.prepare('SELECT COUNT(*) AS total FROM contratos').get();
+    let total = 0;
+    if (isSupabaseActive && supabase) {
+      try {
+        const { count, error } = await supabase.from('contratos').select('*', { count: 'exact', head: true });
+        if (!error && count !== null) {
+          total = count;
+        }
+      } catch (e) {
+        console.warn('Erro ao consultar contagem no Supabase:', e.message);
+      }
+    } else {
+      const countRow = localDb.prepare('SELECT COUNT(*) AS total FROM contratos').get();
+      total = countRow ? countRow.total : 0;
+    }
+
     res.json({
       status: 'online',
       provider: isSupabaseActive ? 'supabase' : 'sqlite',
-      providerName: isSupabaseActive ? 'Supabase Cloud (PostgreSQL Grátis)' : 'SQLite Local (Embutido Grátis)',
-      totalContratos: countRow.total,
+      providerName: isSupabaseActive ? 'Supabase Nuvem (PostgreSQL)' : 'SQLite Local (Embutido)',
+      totalContratos: total,
       supabaseConfigured: isSupabaseActive,
-      dbFile: DB_FILE
+      dbFile: isSupabaseActive ? 'Supabase Cloud PostgreSQL' : DB_FILE
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -325,11 +146,9 @@ app.post('/api/config-supabase', async (req, res) => {
     return res.status(400).json({ error: 'Credenciais do Supabase inválidas.' });
   }
 
-  // Tenta testar a conexão com o Supabase
   try {
     const { data, error } = await supabase.from('contratos').select('id').limit(1);
     if (error) {
-      // Se a tabela ainda não existir no Supabase, avisa o usuário para rodar o schema
       return res.json({
         success: true,
         warning: 'Conectado ao Supabase, mas a tabela "contratos" ainda não foi criada. Execute o arquivo sql/schema.sql no SQL Editor do Supabase!',
@@ -337,9 +156,10 @@ app.post('/api/config-supabase', async (req, res) => {
       });
     }
 
-    // Salvar no .env para persistir
     const envContent = `SUPABASE_URL=${cleanUrl}\nSUPABASE_ANON_KEY=${cleanKey}\nPORT=${PORT}\n`;
-    fs.writeFileSync(path.join(__dirname, '.env'), envContent);
+    try {
+      fs.writeFileSync(path.join(__dirname, '.env'), envContent);
+    } catch (e) {}
 
     res.json({
       success: true,
@@ -354,45 +174,41 @@ app.post('/api/config-supabase', async (req, res) => {
 // Listar todos os contratos
 app.get('/api/contratos', async (req, res) => {
   try {
-    // Se Supabase estiver ativo, tenta buscar dele
     if (isSupabaseActive && supabase) {
-      try {
-        const { data, error } = await supabase.from('contratos').select('*').order('created_at', { ascending: false });
-        if (!error && data) {
-          // Normaliza formato
-          const normalized = data.map(c => ({
-            id: c.id,
-            fornecedor: c.fornecedor,
-            cnpj: c.cnpj,
-            objeto: c.objeto,
-            processo: c.processo,
-            contrato: c.contrato,
-            aditivoAtual: c.aditivo_atual || c.aditivoAtual,
-            qtdAditivos: c.qtd_aditivos ?? c.qtdAditivos ?? 0,
-            inicioVigencia: c.inicio_vigencia || c.inicioVigencia,
-            fimVigencia: c.fim_vigencia || c.fimVigencia,
-            valorMensal: c.valor_mensal || c.valorMensal || '0,00',
-            valorTotal: c.valor_total || c.valorTotal || '0,00',
-            valorInicial: c.valor_inicial || c.valorInicial || '0,00',
-            valorAditivos: c.valor_aditivos || c.valorAditivos || '0,00',
-            limiteLegal: c.limite_legal || c.limiteLegal || '0.25',
-            fiscal: c.fiscal,
-            marcoReajuste: c.marco_reajuste || c.marcoReajuste,
-            prazoPreclusao: c.prazo_preclusao || c.prazoPreclusao,
-            observacoes: c.observacoes,
-            attachmentName: c.attachment_name || c.attachmentName,
-            attachmentData: c.attachment_data || c.attachmentData
-          }));
-          return res.json(normalized);
-        }
-      } catch (sbErr) {
-        console.warn('[Supabase Fallback] Falha na consulta, usando SQLite local:', sbErr.message);
+      const { data, error } = await supabase.from('contratos').select('*').order('created_at', { ascending: false });
+      if (error) {
+        console.error('[Supabase Error]:', error.message);
+        return res.status(500).json({ error: 'Erro ao consultar Supabase: ' + error.message });
       }
+      const normalized = (data || []).map(c => ({
+        id: c.id,
+        fornecedor: c.fornecedor,
+        cnpj: c.cnpj,
+        objeto: c.objeto,
+        processo: c.processo,
+        contrato: c.contrato,
+        aditivoAtual: c.aditivo_atual || c.aditivoAtual || 'Contrato Inicial',
+        qtdAditivos: c.qtd_aditivos ?? c.qtdAditivos ?? 0,
+        inicioVigencia: c.inicio_vigencia || c.inicioVigencia,
+        fimVigencia: c.fim_vigencia || c.fimVigencia,
+        valorMensal: c.valor_mensal || c.valorMensal || '0,00',
+        valorTotal: c.valor_total || c.valorTotal || '0,00',
+        valorInicial: c.valor_inicial || c.valorInicial || '0,00',
+        valorAditivos: c.valor_aditivos || c.valorAditivos || '0,00',
+        limiteLegal: c.limite_legal || c.limiteLegal || '0.25',
+        fiscal: c.fiscal,
+        marcoReajuste: c.marco_reajuste || c.marcoReajuste,
+        prazoPreclusao: c.prazo_preclusao || c.prazoPreclusao,
+        observacoes: c.observacoes,
+        attachmentName: c.attachment_name || c.attachmentName,
+        attachmentData: c.attachment_data || c.attachmentData
+      }));
+      return res.json(normalized);
     }
 
-    // SQLite Local
+    // Se Supabase não estiver configurado, usa SQLite Local (banco limpo)
     const rows = localDb.prepare('SELECT * FROM contratos ORDER BY rowid DESC').all();
-    res.json(rows);
+    res.json(rows || []);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -404,7 +220,31 @@ app.get('/api/contratos/:id', async (req, res) => {
   try {
     if (isSupabaseActive && supabase) {
       const { data, error } = await supabase.from('contratos').select('*').eq('id', id).single();
-      if (!error && data) return res.json(data);
+      if (!error && data) {
+        return res.json({
+          id: data.id,
+          fornecedor: data.fornecedor,
+          cnpj: data.cnpj,
+          objeto: data.objeto,
+          processo: data.processo,
+          contrato: data.contrato,
+          aditivoAtual: data.aditivo_atual || data.aditivoAtual,
+          qtdAditivos: data.qtd_aditivos ?? data.qtdAditivos ?? 0,
+          inicioVigencia: data.inicio_vigencia || data.inicioVigencia,
+          fimVigencia: data.fim_vigencia || data.fimVigencia,
+          valorMensal: data.valor_mensal || data.valorMensal || '0,00',
+          valorTotal: data.valor_total || data.valorTotal || '0,00',
+          valorInicial: data.valor_inicial || data.valorInicial || '0,00',
+          valorAditivos: data.valor_aditivos || data.valorAditivos || '0,00',
+          limiteLegal: data.limite_legal || data.limiteLegal || '0.25',
+          fiscal: data.fiscal,
+          marcoReajuste: data.marco_reajuste || data.marcoReajuste,
+          prazoPreclusao: data.prazo_preclusao || data.prazoPreclusao,
+          observacoes: data.observacoes,
+          attachmentName: data.attachment_name || data.attachmentName,
+          attachmentData: data.attachment_data || data.attachmentData
+        });
+      }
     }
 
     const row = localDb.prepare('SELECT * FROM contratos WHERE id = ?').get(id);
@@ -423,23 +263,8 @@ app.post('/api/contratos', async (req, res) => {
       return res.status(400).json({ error: 'Fornecedor e Fim de Vigência são obrigatórios.' });
     }
 
-    const id = c.id || ('pmto-' + Date.now());
+    const id = c.id || ('pmto-' + Date.now() + '-' + Math.floor(Math.random() * 1000));
     const now = new Date().toISOString();
-
-    // Salvar no SQLite local
-    const insertStmt = localDb.prepare(`
-      INSERT INTO contratos (
-        id, fornecedor, cnpj, objeto, processo, contrato, aditivoAtual, qtdAditivos,
-        inicioVigencia, fimVigencia, valorMensal, valorTotal, valorInicial, valorAditivos,
-        limiteLegal, fiscal, marcoReajuste, prazoPreclusao, observacoes, attachmentName,
-        attachmentData, createdAt, updatedAt
-      ) VALUES (
-        @id, @fornecedor, @cnpj, @objeto, @processo, @contrato, @aditivoAtual, @qtdAditivos,
-        @inicioVigencia, @fimVigencia, @valorMensal, @valorTotal, @valorInicial, @valorAditivos,
-        @limiteLegal, @fiscal, @marcoReajuste, @prazoPreclusao, @observacoes, @attachmentName,
-        @attachmentData, @createdAt, @updatedAt
-      )
-    `);
 
     const record = {
       id,
@@ -467,9 +292,23 @@ app.post('/api/contratos', async (req, res) => {
       updatedAt: now
     };
 
+    // Salvar no SQLite local
+    const insertStmt = localDb.prepare(`
+      INSERT INTO contratos (
+        id, fornecedor, cnpj, objeto, processo, contrato, aditivoAtual, qtdAditivos,
+        inicioVigencia, fimVigencia, valorMensal, valorTotal, valorInicial, valorAditivos,
+        limiteLegal, fiscal, marcoReajuste, prazoPreclusao, observacoes, attachmentName,
+        attachmentData, createdAt, updatedAt
+      ) VALUES (
+        @id, @fornecedor, @cnpj, @objeto, @processo, @contrato, @aditivoAtual, @qtdAditivos,
+        @inicioVigencia, @fimVigencia, @valorMensal, @valorTotal, @valorInicial, @valorAditivos,
+        @limiteLegal, @fiscal, @marcoReajuste, @prazoPreclusao, @observacoes, @attachmentName,
+        @attachmentData, @createdAt, @updatedAt
+      )
+    `);
     insertStmt.run(record);
 
-    // Se Supabase estiver ativo, salva lá também em sincronia
+    // Se Supabase estiver ativo, salva também no PostgreSQL
     if (isSupabaseActive && supabase) {
       try {
         await supabase.from('contratos').insert([{
@@ -495,7 +334,7 @@ app.post('/api/contratos', async (req, res) => {
           attachment_name: record.attachmentName
         }]);
       } catch (sbErr) {
-        console.warn('[Supabase Sync Warn] Não foi possível replicar no Supabase:', sbErr.message);
+        console.error('[Supabase Insert Warn]:', sbErr.message);
       }
     }
 
@@ -588,7 +427,7 @@ app.put('/api/contratos/:id', async (req, res) => {
           updated_at: now
         }).eq('id', id);
       } catch (sbErr) {
-        console.warn('[Supabase Sync Warn]:', sbErr.message);
+        console.error('[Supabase Update Warn]:', sbErr.message);
       }
     }
 
@@ -609,23 +448,11 @@ app.delete('/api/contratos/:id', async (req, res) => {
       try {
         await supabase.from('contratos').delete().eq('id', id);
       } catch (sbErr) {
-        console.warn('[Supabase Sync Warn]:', sbErr.message);
+        console.error('[Supabase Delete Warn]:', sbErr.message);
       }
     }
 
     res.json({ success: true, id });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Restaurar dados padrão de exemplo
-app.post('/api/reset-sample', (req, res) => {
-  try {
-    localDb.exec('DELETE FROM contratos');
-    seedLocalDbIfEmpty();
-    const rows = localDb.prepare('SELECT * FROM contratos ORDER BY rowid DESC').all();
-    res.json({ success: true, count: rows.length, data: rows });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -642,7 +469,7 @@ if (!process.env.VERCEL) {
     console.log(`  Polícia Militar do Estado do Tocantins                        `);
     console.log(`================================================================`);
     console.log(`  ● Servidor rodando em: http://localhost:${PORT}`);
-    console.log(`  ● Banco de dados ativo: ${isSupabaseActive ? 'Supabase Cloud' : 'SQLite Local Nativo (Gratuito)'}`);
+    console.log(`  ● Banco de dados ativo: ${isSupabaseActive ? 'Supabase Cloud' : 'SQLite Local (Livre de dados fictícios)'}`);
     console.log(`  ● Arquivo SQLite local: ${DB_FILE}`);
     console.log(`================================================================`);
   });

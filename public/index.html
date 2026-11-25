@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SIGEC — Sistema de Gestão de Contratos e Vigências | PMTO</title>
-  <meta name="description" content="Sistema de Gestão de Contratos e Vigências da Polícia Militar do Estado do Tocantins - Gerência de Contratos com Banco de Dados Gratuito Integrado.">
+  <meta name="description" content="Sistema de Gestão de Contratos e Vigências da Polícia Militar do Estado do Tocantins - SETIMA SEÇÃO DO ESTADO MAIOR - GERAL PM7 / ATIT com Banco de Dados Integrado.">
   <style>
     /* ==========================================================================
        SIGEC PMTO - FOLHA DE ESTILOS INSTITUCIONAL (AZUL ESCURO E GRAFITE)
@@ -1561,7 +1561,7 @@
         </svg>
         <div class="brand-titles">
           <h1><span class="sigla">SIGEC</span> — Sistema de Gestão de Contratos e Vigências | PMTO</h1>
-          <p>Polícia Militar do Estado do Tocantins — Gerência de Contratos e Convênios</p>
+          <p>SETIMA SEÇÃO DO ESTADO MAIOR - GERAL PM7 / ATIT</p>
         </div>
       </div>
 
@@ -1991,7 +1991,7 @@
       <div class="footer-info">
         <strong>Polícia Militar do Estado do Tocantins — Quartel do Comando Geral (QCG)</strong>
         <p style="color: var(--pmto-slate-400); font-size: 11.5px; margin-top: 2px;">
-          Gerência de Contratos e Convênios | Diretoria de Apoio Logístico (DAL)
+          SETIMA SEÇÃO DO ESTADO MAIOR - GERAL PM7 / ATIT
         </p>
         <div class="privacy-alert">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 13px; height: 13px;">
@@ -2018,11 +2018,6 @@
           Importar JSON
         </button>
         <input type="file" id="import-json-file-input" accept=".json" style="display:none;" onchange="handleImportJSON(event)">
-
-        <button class="btn btn-secondary btn-sm" onclick="confirmResetSampleData()" title="Recarregar dados de exemplo da PMTO">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
-          Restaurar Exemplos
-        </button>
 
         <button class="btn btn-sm" onclick="openDatabaseModal()" style="background: #10B981; border: 1px solid #059669; color: #FFF; font-weight: 700;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
@@ -2343,7 +2338,13 @@
        MOTOR JAVASCRIPT: CLIENTE API COM SUPABASE + SQLITE LOCAL + OCR
        ========================================================================= -->
   <script>
-    const STORAGE_KEY = 'SIGEC_PMTO_LOCAL_BACKUP_V1';
+    const STORAGE_KEY = 'SIGEC_PMTO_LOCAL_REAL_DATA_V2';
+    // Limpar imediatamente qualquer cache legado com dados fictícios
+    try {
+      localStorage.removeItem('SIGEC_PMTO_LOCAL_BACKUP_V1');
+      localStorage.removeItem('SIGEC_PMTO_CONTRATOS');
+    } catch (e) {}
+
     let contracts = [];
     let currentExtractedData = null;
     let pendingFileAttachment = null;
@@ -2367,7 +2368,7 @@
     };
 
     /* --------------------------------------------------------------------------
-       COMUNICAÇÃO COM O BANCO DE DADOS (API REST + FALLBACK LOCALSTORAGE)
+       COMUNICAÇÃO COM O BANCO DE DADOS (DADOS REAIS EXCLUSIVOS)
        -------------------------------------------------------------------------- */
     async function checkDatabaseStatus() {
       try {
@@ -2375,17 +2376,16 @@
         if (res.ok) {
           const data = await res.json();
           isServerAvailable = true;
-          document.getElementById('db-status-text').textContent = `Banco: ${data.provider === 'supabase' ? 'Supabase Nuvem' : 'SQLite Local (Grátis)'}`;
+          document.getElementById('db-status-text').textContent = `Banco: ${data.provider === 'supabase' ? 'Supabase Nuvem' : 'SQLite Local'}`;
           document.getElementById('modal-db-provider-name').textContent = data.providerName;
           document.getElementById('footer-storage-info').textContent = `Banco de Dados: ${data.providerName} (${data.totalContratos} contratos)`;
           return true;
         }
       } catch (err) {
-        // Modo offline / file://
         isServerAvailable = false;
-        document.getElementById('db-status-text').textContent = 'Banco: LocalStorage Navegador';
-        document.getElementById('modal-db-provider-name').textContent = 'Navegador Local (Modo Offline / Sem Servidor)';
-        document.getElementById('footer-storage-info').textContent = 'Armazenamento: LocalStorage do Navegador';
+        document.getElementById('db-status-text').textContent = 'Banco: Offline';
+        document.getElementById('modal-db-provider-name').textContent = 'Servidor Offline';
+        document.getElementById('footer-storage-info').textContent = 'Banco de Dados: Desconectado';
         return false;
       }
     }
@@ -2395,21 +2395,28 @@
         try {
           const res = await fetch('/api/contratos');
           if (res.ok) {
-            contracts = await res.json();
-            // Salva backup local
+            const data = await res.json();
+            contracts = Array.isArray(data) ? data : [];
             localStorage.setItem(STORAGE_KEY, JSON.stringify(contracts));
+            return;
+          } else {
+            const errData = await res.json().catch(() => ({}));
+            showToast('Erro ao carregar contratos: ' + (errData.error || res.statusText), 'toast-error');
+            contracts = [];
             return;
           }
         } catch (err) {
-          console.warn('Servidor inacessível, recuperando backup do LocalStorage:', err);
+          console.warn('Servidor inacessível:', err);
+          showToast('Falha na comunicação com o banco de dados.', 'toast-error');
+          const raw = localStorage.getItem(STORAGE_KEY);
+          contracts = raw ? JSON.parse(raw) : [];
+          return;
         }
       }
 
-      // Fallback
+      // Se operando sem servidor (file://)
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        contracts = JSON.parse(raw);
-      }
+      contracts = raw ? JSON.parse(raw) : [];
     }
 
     async function saveContractToDatabase(contractData, isNew) {
@@ -2665,7 +2672,7 @@
       const tbody = document.getElementById('painel-vencimentos-tbody');
       tbody.innerHTML = '';
       if (sorted.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--pmto-slate-400);">Nenhum contrato cadastrado.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 25px; color: var(--pmto-slate-400);">Nenhum contrato cadastrado no banco de dados. Clique em "+ Novo Contrato" para iniciar os registros reais.</td></tr>`;
       } else {
         sorted.slice(0, 7).forEach(c => {
           const m = c.metrics;
@@ -2889,7 +2896,10 @@
       document.getElementById('contratos-count-label').textContent = `Exibindo ${filtered.length} de ${contracts.length} contratos`;
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="19" style="text-align: center; padding: 30px; color: var(--pmto-slate-400);">Nenhum contrato encontrado.</td></tr>`;
+        const msg = contracts.length === 0 
+          ? 'Nenhum contrato cadastrado no banco de dados. Utilize o botão "+ Novo Contrato" acima para cadastrar.' 
+          : 'Nenhum contrato encontrado para os filtros aplicados.';
+        tbody.innerHTML = `<tr><td colspan="19" style="text-align: center; padding: 30px; color: var(--pmto-slate-400);">${msg}</td></tr>`;
         return;
       }
 
@@ -3175,21 +3185,6 @@
         }
       } catch (err) {
         showToast('Erro ao comunicar com o servidor: ' + err.message, 'toast-error');
-      }
-    }
-
-    async function confirmResetSampleData() {
-      if (confirm('Deseja recarregar os contratos de exemplo da PMTO no banco de dados?')) {
-        try {
-          const res = await fetch('/api/reset-sample', { method: 'POST' });
-          if (res.ok) {
-            await fetchContractsFromDatabase();
-            refreshAllViews();
-            showToast('✓ Dados padrão da PMTO restaurados no banco!', 'toast-success');
-          }
-        } catch (err) {
-          showToast('Erro ao restaurar dados.', 'toast-error');
-        }
       }
     }
 
