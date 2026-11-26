@@ -59,3 +59,24 @@ CREATE TRIGGER update_contratos_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
+
+-- ============================================================================
+-- Tabela: previsoes (Planejamento Plurianual e Processos em Andamento)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS previsoes (
+    id                TEXT PRIMARY KEY DEFAULT ('prev-' || extract(epoch from now())::bigint || '-' || floor(random() * 1000)::int),
+    objeto            TEXT NOT NULL,
+    ano_previsto      INTEGER NOT NULL,
+    valor_previsto    TEXT DEFAULT '0,00',
+    fase_atual        TEXT DEFAULT 'Previsão Orçamentária',
+    prioridade        TEXT DEFAULT 'Média',
+    setor_responsavel TEXT DEFAULT 'PM7 / ATIT',
+    observacoes       TEXT,
+    created_at        TIMESTAMPTZ DEFAULT NOW(),
+    updated_at        TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_previsoes_ano ON previsoes(ano_previsto);
+ALTER TABLE previsoes ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Acesso público total às previsões" ON previsoes;
+CREATE POLICY "Acesso público total às previsões" ON previsoes FOR ALL USING (true) WITH CHECK (true);

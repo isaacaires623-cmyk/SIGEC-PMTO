@@ -1632,6 +1632,15 @@
         <span class="badge-counter" id="tab-counter-reajustes">0</span>
       </button>
 
+      <button class="nav-tab-btn" role="tab" aria-selected="false" aria-controls="tab-planejamento" id="tab-btn-planejamento" onclick="switchTab('planejamento')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        Planejamento / Previsões
+        <span class="badge-counter" id="tab-counter-planejamento" style="background-color: #2563EB; color: #FFF;">0</span>
+      </button>
+
       <button class="nav-tab-btn" role="tab" aria-selected="false" aria-controls="tab-como-usar" id="tab-btn-como-usar" onclick="switchTab('como-usar')">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"></circle>
@@ -1940,7 +1949,104 @@
       </div>
     </section>
 
-    <!-- ABA 5: COMO USAR -->
+    <!-- ABA 5: PLANEJAMENTO E PREVISÕES FUTURAS -->
+    <section class="tab-pane" id="tab-planejamento" role="tabpanel" aria-labelledby="tab-btn-planejamento">
+      <div class="panel-section-header" style="margin-bottom: 18px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <h2>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px; color: #2563EB;">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            Planejamento Plurianual & Processos em Andamento
+          </h2>
+          <p style="color: var(--pmto-slate-600); font-size: 13px; margin-top: 4px;">
+            Mapeamento de demandas futuras, estimativas de valor e previsão orçamentária para os próximos anos (sem exigência prévia de contrato ou processo).
+          </p>
+        </div>
+        <button class="btn btn-primary" onclick="openPrevisaoModal()" style="background: linear-gradient(135deg, #2563EB, #1D4ED8); border-color: #1D4ED8; font-weight: 700;">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          + Nova Previsão / Demanda Futura
+        </button>
+      </div>
+
+      <!-- CARDS DE METRICAS DE PLANEJAMENTO -->
+      <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); margin-bottom: 22px;">
+        <div class="kpi-card" style="border-left: 4px solid #2563EB;">
+          <span class="kpi-label">Total em Planejamento</span>
+          <span class="kpi-value" id="plan-kpi-total-valor" style="color: #1E3A8A; font-size: 20px;">R$ 0,00</span>
+          <span class="kpi-subtext" id="plan-kpi-total-count">0 processos previstos</span>
+        </div>
+        <div class="kpi-card" style="border-left: 4px solid #10B981;">
+          <span class="kpi-label">Previsão Próximo Ano</span>
+          <span class="kpi-value" id="plan-kpi-ano1-valor" style="color: #065F46; font-size: 20px;">R$ 0,00</span>
+          <span class="kpi-subtext" id="plan-kpi-ano1-label">Ano 2026/2027</span>
+        </div>
+        <div class="kpi-card" style="border-left: 4px solid #D97706;">
+          <span class="kpi-label">Anos Seguintes</span>
+          <span class="kpi-value" id="plan-kpi-anos-seguintes-valor" style="color: #92400E; font-size: 20px;">R$ 0,00</span>
+          <span class="kpi-subtext">Previsão plurianual</span>
+        </div>
+        <div class="kpi-card" style="border-left: 4px solid #8B5CF6;">
+          <span class="kpi-label">Setor Responsável</span>
+          <span class="kpi-value" style="color: #5B21B6; font-size: 17px; font-weight: 700;">PM7 / ATIT</span>
+          <span class="kpi-subtext">Estado Maior Geral</span>
+        </div>
+      </div>
+
+      <!-- GRAFICO DE PROJEÇÃO POR ANO -->
+      <div class="card" style="margin-bottom: 22px; padding: 18px 22px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <h3 style="font-size: 14px; font-weight: 700; color: var(--pmto-navy-primary); display: flex; align-items: center; gap: 8px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; color: #2563EB;"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            Projeção Orçamentária por Ano (Previsão de Gastos Futuros)
+          </h3>
+          <span class="badge" style="background: #EFF6FF; color: #1D4ED8; font-weight: 600;">Plano Plurianual</span>
+        </div>
+        <div id="plan-chart-bars-container" style="display: flex; flex-direction: column; gap: 12px;">
+          <!-- Barras de anos renderizadas dinamicamente via JS -->
+        </div>
+      </div>
+
+      <!-- TABELA DE PROCESSOS EM ANDAMENTO E PREVISÕES -->
+      <div class="table-container">
+        <div class="table-toolbar" style="padding: 12px 16px; background: var(--pmto-slate-50); border-bottom: 1px solid var(--pmto-slate-200); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+          <div style="display: flex; gap: 10px; align-items: center; flex: 1; max-width: 450px;">
+            <input type="text" id="plan-search-input" class="form-control form-control-sm" placeholder="Buscar por objeto, fase ou observação..." oninput="renderPlanningTable()">
+          </div>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <select id="plan-filter-ano" class="form-control form-control-sm" style="width: 140px;" onchange="renderPlanningTable()">
+              <option value="TODOS">Todos os Anos</option>
+            </select>
+            <select id="plan-filter-fase" class="form-control form-control-sm" style="width: 180px;" onchange="renderPlanningTable()">
+              <option value="TODAS">Todas as Fases</option>
+              <option value="Previsão Orçamentária">Previsão Orçamentária</option>
+              <option value="Estudo Técnico Preliminar (ETP)">Estudo Técnico Preliminar (ETP)</option>
+              <option value="Termo de Referência (TR)">Termo de Referência (TR)</option>
+              <option value="Fase de Licitação">Fase de Licitação</option>
+            </select>
+          </div>
+        </div>
+
+        <table class="pmto-table">
+          <thead>
+            <tr>
+              <th style="width: 40px;">#</th>
+              <th>Demanda / Objeto Previsto</th>
+              <th style="width: 110px; text-align: center;">Ano Previsto</th>
+              <th class="th-num" style="width: 150px;">Valor Estimado</th>
+              <th style="width: 180px;">Fase Atual</th>
+              <th style="width: 110px; text-align: center;">Prioridade</th>
+              <th style="width: 120px;">Setor</th>
+              <th style="width: 190px; text-align: right;">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="plan-table-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ABA 6: COMO USAR -->
     <section class="tab-pane" id="tab-como-usar" role="tabpanel" aria-labelledby="tab-btn-como-usar">
       <div class="guide-section">
         <h2>
@@ -2331,6 +2437,88 @@
     </div>
   </div>
 
+  <!-- MODAL: CADASTRAR / EDITAR PREVISÃO OU PROCESSO EM ANDAMENTO -->
+  <div class="modal-backdrop" id="modal-previsao-backdrop" role="dialog" aria-modal="true">
+    <div class="modal-dialog" style="max-width: 650px;">
+      <div class="modal-header" style="background: linear-gradient(135deg, #1E3A8A, #1D4ED8);">
+        <h2 id="modal-previsao-title" style="display: flex; align-items: center; gap: 8px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          Nova Demanda / Previsão Futura (PM7 / ATIT)
+        </h2>
+        <button class="modal-close-btn" onclick="closePrevisaoModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 12px; color: var(--pmto-slate-600); margin-bottom: 14px;">
+          Cadastre previsões de contratações futuras para os próximos anos. <strong>Não é necessário ter número de contrato ou processo.</strong>
+        </p>
+
+        <form id="previsao-form" onsubmit="handleSavePrevisao(event)" style="display: flex; flex-direction: column; gap: 14px;">
+          <input type="hidden" id="prev-id-input">
+
+          <div class="form-group">
+            <label class="form-label" for="prev-objeto-input">Objeto / Descrição da Necessidade Futura <span style="color:#DC2626;">*</span></label>
+            <textarea id="prev-objeto-input" class="form-control" rows="3" placeholder="Ex: Aquisição de coletes balísticos nível III-A para o efetivo da PMTO" required></textarea>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label" for="prev-ano-input">Ano Previsto de Execução <span style="color:#DC2626;">*</span></label>
+              <select id="prev-ano-input" class="form-control" required>
+                <option value="2026">2026</option>
+                <option value="2027" selected>2027</option>
+                <option value="2028">2028</option>
+                <option value="2029">2029</option>
+                <option value="2030">2030</option>
+                <option value="2031">2031</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="prev-valor-input">Valor Previsto / Estimado (R$) <span style="color:#DC2626;">*</span></label>
+              <input type="text" id="prev-valor-input" class="form-control" placeholder="0,00" oninput="maskCurrency(this)" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label" for="prev-fase-input">Fase Atual da Demanda</label>
+              <select id="prev-fase-input" class="form-control">
+                <option value="Previsão Orçamentária" selected>Previsão Orçamentária</option>
+                <option value="Estudo Técnico Preliminar (ETP)">Estudo Técnico Preliminar (ETP)</option>
+                <option value="Termo de Referência (TR)">Termo de Referência (TR)</option>
+                <option value="Fase de Licitação">Fase de Licitação</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="prev-prioridade-input">Grau de Prioridade</label>
+              <select id="prev-prioridade-input" class="form-control">
+                <option value="Alta">Alta</option>
+                <option value="Média" selected>Média</option>
+                <option value="Baixa">Baixa</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="prev-setor-input">Setor Solicitante / Responsável</label>
+            <input type="text" id="prev-setor-input" class="form-control" value="PM7 / ATIT">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="prev-obs-input">Observações / Justificativa</label>
+            <textarea id="prev-obs-input" class="form-control" rows="2" placeholder="Dotação orçamentária, justificativa estratégica, etc."></textarea>
+          </div>
+
+          <div class="modal-footer" style="padding: 14px 0 0 0; margin-top: 8px; background: none; border-top: 1px solid var(--pmto-slate-200); display: flex; justify-content: flex-end; gap: 8px;">
+            <button type="button" class="btn btn-secondary" onclick="closePrevisaoModal()">Cancelar</button>
+            <button type="submit" class="btn btn-primary" id="btn-salvar-previsao" style="background: #2563EB; border-color: #1D4ED8;">Salvar Previsão no Banco</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- CONTÊINER DE TOASTS -->
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
@@ -2613,24 +2801,43 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    function isPrevisao(c) {
+      if (!c) return false;
+      return (c.id && c.id.toString().startsWith('prev-')) || c.contrato === 'EM ANDAMENTO' || c.processo === 'EM ANDAMENTO';
+    }
+
+    function getActiveContracts() {
+      return contracts.filter(c => !isPrevisao(c));
+    }
+
+    function getPrevisoes() {
+      return contracts.filter(c => isPrevisao(c));
+    }
+
     function refreshAllViews() {
       renderDashboard();
       renderDashboardCharts();
       renderContractsTable();
       renderAlertsTab();
       renderReajustesTab();
+      renderPlanningTab();
       updateTabCounters();
     }
 
     function updateTabCounters() {
+      const active = getActiveContracts();
+      const plan = getPrevisoes();
       let totalAlertas = 0;
-      contracts.forEach(c => {
+      active.forEach(c => {
         const m = calculateContractMetrics(c);
         if (m.diasRestantes !== null && m.diasRestantes <= 30) totalAlertas++;
       });
-      document.getElementById('tab-counter-contratos').textContent = contracts.length;
+      document.getElementById('tab-counter-contratos').textContent = active.length;
       document.getElementById('tab-counter-alertas').textContent = totalAlertas;
-      document.getElementById('tab-counter-reajustes').textContent = contracts.length;
+      document.getElementById('tab-counter-reajustes').textContent = active.length;
+      if (document.getElementById('tab-counter-planejamento')) {
+        document.getElementById('tab-counter-planejamento').textContent = plan.length;
+      }
     }
 
     function renderDashboard() {
@@ -2638,7 +2845,8 @@
       let somaMensal = 0, somaTotal = 0, totalPendencias = 0;
       const pendenciasItems = [];
 
-      const sorted = [...contracts].map(c => ({ ...c, metrics: calculateContractMetrics(c) }))
+      const activeList = getActiveContracts();
+      const sorted = [...activeList].map(c => ({ ...c, metrics: calculateContractMetrics(c) }))
         .sort((a, b) => (a.metrics.diasRestantes ?? 9999) - (b.metrics.diasRestantes ?? 9999));
 
       sorted.forEach(item => {
@@ -2716,10 +2924,11 @@
     }
 
     function renderDashboardCharts() {
+      const activeList = getActiveContracts();
       const badgeTotal = document.getElementById('charts-total-badge');
-      if (badgeTotal) badgeTotal.textContent = `${contracts.length} processos`;
+      if (badgeTotal) badgeTotal.textContent = `${activeList.length} processos`;
 
-      if (contracts.length === 0) {
+      if (activeList.length === 0) {
         document.getElementById('chart-faixas-donut-container').innerHTML = '<div style="color:var(--pmto-slate-400); font-size:12px;">Sem dados</div>';
         return;
       }
@@ -2728,7 +2937,7 @@
       let valVencidos = 0, valCritico = 0, valAtencao = 0, valMonitorar = 0, valRegular = 0;
       let totalValor = 0;
 
-      const withMetrics = contracts.map(c => {
+      const withMetrics = activeList.map(c => {
         const m = calculateContractMetrics(c);
         totalValor += m.valorTotal;
         if (m.diasRestantes !== null) {
@@ -2743,7 +2952,7 @@
         return { ...c, metrics: m };
       });
 
-      const totalCount = contracts.length;
+      const totalCount = activeList.length;
 
       // 1. Donut Chart (SVG)
       const faixasData = [
@@ -2872,8 +3081,9 @@
       const faixa = document.getElementById('contratos-filter-faixa')?.value || 'TODAS';
       const sort = document.getElementById('contratos-sort-by')?.value || 'dias-asc';
 
+      const activeList = getActiveContracts();
       tbody.innerHTML = '';
-      let filtered = contracts.filter(c => {
+      let filtered = activeList.filter(c => {
         const text = `${c.fornecedor} ${c.objeto} ${c.processo} ${c.contrato} ${c.fiscal}`.toLowerCase();
         if (!text.includes(search)) return false;
         if (faixa !== 'TODAS') {
@@ -2893,10 +3103,10 @@
         return (a.contrato || '').localeCompare(b.contrato || '');
       });
 
-      document.getElementById('contratos-count-label').textContent = `Exibindo ${filtered.length} de ${contracts.length} contratos`;
+      document.getElementById('contratos-count-label').textContent = `Exibindo ${filtered.length} de ${activeList.length} contratos`;
 
       if (filtered.length === 0) {
-        const msg = contracts.length === 0 
+        const msg = activeList.length === 0 
           ? 'Nenhum contrato cadastrado no banco de dados. Utilize o botão "+ Novo Contrato" acima para cadastrar.' 
           : 'Nenhum contrato encontrado para os filtros aplicados.';
         tbody.innerHTML = `<tr><td colspan="19" style="text-align: center; padding: 30px; color: var(--pmto-slate-400);">${msg}</td></tr>`;
@@ -2948,6 +3158,7 @@
     function renderAlertsTab() {
       const container = document.getElementById('alertas-container');
       container.innerHTML = '';
+      const activeList = getActiveContracts();
 
       const faixas = [
         { label: 'Contratos Vencidos', banner: 'alert-banner-vencido', filter: m => m.diasRestantes !== null && m.diasRestantes < 0, action: 'Vigência encerrada! Verificar formalização tempestiva de prorrogação ou encerramento definitivo.' },
@@ -2958,7 +3169,7 @@
       ];
 
       faixas.forEach(f => {
-        const list = contracts.filter(c => f.filter(calculateContractMetrics(c)));
+        const list = activeList.filter(c => f.filter(calculateContractMetrics(c)));
         const group = document.createElement('div');
         group.className = 'alert-group';
         group.innerHTML = `
@@ -2996,12 +3207,13 @@
     function renderReajustesTab() {
       const tbody = document.getElementById('reajustes-table-tbody');
       tbody.innerHTML = '';
-      if (contracts.length === 0) {
+      const activeList = getActiveContracts();
+      if (activeList.length === 0) {
         tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 25px; color: var(--pmto-slate-400);">Sem contratos cadastrados.</td></tr>`;
         return;
       }
 
-      contracts.forEach(c => {
+      activeList.forEach(c => {
         const m = calculateContractMetrics(c);
         const tr = document.createElement('tr');
         const diasText = m.diasPreclusao !== null ? (m.diasPreclusao < 0 ? `<span style="color:#DC2626; font-weight:700;">${m.diasPreclusao}d (Precluso)</span>` : `<strong>${m.diasPreclusao}d</strong>`) : '--';
@@ -3422,6 +3634,257 @@
     function escapeHTML(str) {
       if (!str) return '';
       return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    /* --------------------------------------------------------------------------
+       GERENCIAMENTO DE PREVISÕES E PLANEJAMENTO PLURIANUAL (PM7 / ATIT)
+       -------------------------------------------------------------------------- */
+    let editingPrevisaoId = null;
+
+    function openPrevisaoModal(id = null) {
+      editingPrevisaoId = id;
+      const form = document.getElementById('previsao-form');
+      form.reset();
+      document.getElementById('prev-id-input').value = '';
+
+      if (id) {
+        document.getElementById('modal-previsao-title').innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          Editar Demanda / Previsão Futura
+        `;
+        const item = contracts.find(c => c.id === id);
+        if (item) {
+          document.getElementById('prev-id-input').value = item.id;
+          document.getElementById('prev-objeto-input').value = item.objeto || '';
+          const anoMatch = (item.fimVigencia || '').match(/\d{4}/);
+          if (anoMatch) document.getElementById('prev-ano-input').value = anoMatch[0];
+          document.getElementById('prev-valor-input').value = item.valorTotal || '';
+          document.getElementById('prev-fase-input').value = item.aditivoAtual || 'Previsão Orçamentária';
+          document.getElementById('prev-setor-input').value = item.fiscal || 'PM7 / ATIT';
+
+          let obs = item.observacoes || '';
+          if (obs.includes('[PRIORIDADE: Alta]')) document.getElementById('prev-prioridade-input').value = 'Alta';
+          else if (obs.includes('[PRIORIDADE: Baixa]')) document.getElementById('prev-prioridade-input').value = 'Baixa';
+          else document.getElementById('prev-prioridade-input').value = 'Média';
+
+          obs = obs.replace(/\[PRIORIDADE:\s*(Alta|Média|Baixa)\]\s*/i, '');
+          document.getElementById('prev-obs-input').value = obs;
+        }
+      } else {
+        document.getElementById('modal-previsao-title').innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          Nova Demanda / Previsão Futura (PM7 / ATIT)
+        `;
+      }
+      document.getElementById('modal-previsao-backdrop').classList.add('active');
+    }
+
+    function closePrevisaoModal() {
+      document.getElementById('modal-previsao-backdrop').classList.remove('active');
+      editingPrevisaoId = null;
+    }
+
+    async function handleSavePrevisao(e) {
+      e.preventDefault();
+      const id = document.getElementById('prev-id-input').value || ('prev-' + Date.now() + '-' + Math.floor(Math.random() * 1000));
+      const ano = document.getElementById('prev-ano-input').value || '2027';
+      const valor = document.getElementById('prev-valor-input').value || '0,00';
+      const objeto = document.getElementById('prev-objeto-input').value.trim();
+      const fase = document.getElementById('prev-fase-input').value;
+      const prioridade = document.getElementById('prev-prioridade-input').value;
+      const setor = document.getElementById('prev-setor-input').value.trim() || 'PM7 / ATIT';
+      const obs = document.getElementById('prev-obs-input').value.trim();
+
+      const record = {
+        id,
+        fornecedor: 'A DEFINIR (PROCESSO EM ANDAMENTO)',
+        cnpj: '',
+        objeto,
+        processo: 'EM ANDAMENTO',
+        contrato: 'EM ANDAMENTO',
+        aditivoAtual: fase,
+        qtdAditivos: 0,
+        inicioVigencia: `01/01/${ano}`,
+        fimVigencia: `31/12/${ano}`,
+        valorMensal: '0,00',
+        valorTotal: valor,
+        valorInicial: valor,
+        valorAditivos: '0,00',
+        limiteLegal: '0.25',
+        fiscal: setor,
+        marcoReajuste: '',
+        prazoPreclusao: '',
+        observacoes: `[PRIORIDADE: ${prioridade}] ${obs}`.trim()
+      };
+
+      const isNew = !document.getElementById('prev-id-input').value;
+      await saveContractToDatabase(record, isNew);
+      closePrevisaoModal();
+      await fetchContractsFromDatabase();
+      refreshAllViews();
+      showToast(isNew ? '✓ Previsão futura cadastrada no banco!' : '✓ Previsão atualizada com sucesso!', 'toast-success');
+    }
+
+    function converterPrevisaoEmContrato(id) {
+      const prev = contracts.find(c => c.id === id);
+      if (!prev) return;
+
+      if (confirm(`Deseja converter a previsão "${prev.objeto.substring(0, 50)}..." em um Contrato Ativo formalizado?`)) {
+        openContractModal();
+        document.getElementById('field-objeto').value = prev.objeto || '';
+        document.getElementById('field-valor-total').value = prev.valorTotal || '';
+        document.getElementById('field-valor-inicial').value = prev.valorTotal || '';
+        document.getElementById('field-fiscal').value = prev.fiscal || 'PM7 / ATIT';
+        document.getElementById('field-fornecedor').value = '';
+        document.getElementById('field-contrato').value = '';
+        document.getElementById('field-processo').value = '';
+        document.getElementById('field-fim-vigencia').value = '';
+
+        deleteContractFromDatabase(id).then(() => {
+          fetchContractsFromDatabase().then(() => refreshAllViews());
+        });
+
+        showToast('Demanda importada! Digite o Nº do Contrato assinado e o Fornecedor para salvar.', 'toast-warning');
+      }
+    }
+
+    function renderPlanningTab() {
+      const planList = getPrevisoes();
+      const search = (document.getElementById('plan-search-input')?.value || '').toLowerCase().trim();
+      const filterAno = document.getElementById('plan-filter-ano')?.value || 'TODOS';
+      const filterFase = document.getElementById('plan-filter-fase')?.value || 'TODAS';
+
+      const selectAno = document.getElementById('plan-filter-ano');
+      if (selectAno) {
+        const anosSet = new Set(['2026', '2027', '2028', '2029', '2030']);
+        planList.forEach(p => {
+          const a = (p.fimVigencia || '').match(/\d{4}/);
+          if (a) anosSet.add(a[0]);
+        });
+        const currentVal = selectAno.value;
+        const sortedAnos = Array.from(anosSet).sort();
+        selectAno.innerHTML = '<option value="TODOS">Todos os Anos</option>' + sortedAnos.map(ano => `<option value="${ano}">${ano}</option>`).join('');
+        selectAno.value = currentVal;
+      }
+
+      let totalValor = 0;
+      let valorAno1 = 0;
+      let valorAnosSeguintes = 0;
+      const currentYear = new Date().getFullYear();
+      const ano1 = currentYear + 1;
+
+      const anosValores = {};
+
+      planList.forEach(p => {
+        const val = parseCurrencyBR(p.valorTotal);
+        totalValor += val;
+        const anoMatch = (p.fimVigencia || '').match(/\d{4}/);
+        const ano = anoMatch ? parseInt(anoMatch[0], 10) : currentYear + 1;
+
+        anosValores[ano] = (anosValores[ano] || 0) + val;
+
+        if (ano <= currentYear + 1) {
+          valorAno1 += val;
+        } else {
+          valorAnosSeguintes += val;
+        }
+      });
+
+      document.getElementById('plan-kpi-total-valor').textContent = formatCurrencyBR(totalValor);
+      document.getElementById('plan-kpi-total-count').textContent = `${planList.length} processo${planList.length !== 1 ? 's' : ''} previsto${planList.length !== 1 ? 's' : ''}`;
+      document.getElementById('plan-kpi-ano1-valor').textContent = formatCurrencyBR(valorAno1);
+      document.getElementById('plan-kpi-ano1-label').textContent = `Até ${ano1}`;
+      document.getElementById('plan-kpi-anos-seguintes-valor').textContent = formatCurrencyBR(valorAnosSeguintes);
+
+      const chartContainer = document.getElementById('plan-chart-bars-container');
+      const anosArr = Object.keys(anosValores).sort();
+      if (anosArr.length === 0) {
+        chartContainer.innerHTML = '<div style="color:var(--pmto-slate-400); font-size:12px; text-align:center; padding: 10px;">Nenhuma previsão cadastrada para gerar projeção plurianual.</div>';
+      } else {
+        const maxVal = Math.max(...Object.values(anosValores), 1);
+        chartContainer.innerHTML = anosArr.map(ano => {
+          const val = anosValores[ano];
+          const pct = Math.max(6, (val / maxVal) * 100);
+          return `
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600;">
+                <span style="color: var(--pmto-navy-primary);">Ano ${ano}</span>
+                <span style="color: #1D4ED8; font-weight: 700;">${formatCurrencyBR(val)}</span>
+              </div>
+              <div style="width: 100%; height: 10px; background: var(--pmto-slate-100); border-radius: 5px; overflow: hidden;">
+                <div style="width: ${pct}%; height: 100%; background: linear-gradient(90deg, #2563EB, #60A5FA); border-radius: 5px;"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      let filtered = planList.filter(p => {
+        const text = `${p.objeto} ${p.aditivoAtual} ${p.observacoes} ${p.fiscal}`.toLowerCase();
+        if (search && !text.includes(search)) return false;
+
+        const anoMatch = (p.fimVigencia || '').match(/\d{4}/);
+        const anoStr = anoMatch ? anoMatch[0] : '';
+        if (filterAno !== 'TODOS' && anoStr !== filterAno) return false;
+
+        if (filterFase !== 'TODAS' && p.aditivoAtual !== filterFase) return false;
+        return true;
+      });
+
+      const tbody = document.getElementById('plan-table-tbody');
+      tbody.innerHTML = '';
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 30px; color: var(--pmto-slate-400);">Nenhum processo em andamento ou previsão cadastrada. Clique no botão acima para adicionar.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach((p, index) => {
+        const anoMatch = (p.fimVigencia || '').match(/\d{4}/);
+        const ano = anoMatch ? anoMatch[0] : '--';
+        const valNum = parseCurrencyBR(p.valorTotal);
+
+        let prioridade = 'Média';
+        let prioridadeClass = 'badge-monitorar';
+        if ((p.observacoes || '').includes('[PRIORIDADE: Alta]')) {
+          prioridade = 'Alta';
+          prioridadeClass = 'badge-vencido';
+        } else if ((p.observacoes || '').includes('[PRIORIDADE: Baixa]')) {
+          prioridade = 'Baixa';
+          prioridadeClass = 'badge-regular';
+        }
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${index + 1}</td>
+          <td>
+            <strong style="color: var(--pmto-navy-primary); font-size: 13px;">${escapeHTML(p.objeto)}</strong>
+            ${p.observacoes ? `<div style="font-size: 11px; color: var(--pmto-slate-500); margin-top: 2px;">${escapeHTML(p.observacoes.replace(/\[PRIORIDADE:\s*(Alta|Média|Baixa)\]\s*/i, ''))}</div>` : ''}
+          </td>
+          <td style="text-align: center;"><span class="badge" style="background:#EFF6FF; color:#1D4ED8; font-weight:700;">${ano}</span></td>
+          <td class="td-num"><strong>${formatCurrencyBR(valNum)}</strong></td>
+          <td><span class="badge" style="background:#F1F5F9; color:#334155; font-size:11px;">${escapeHTML(p.aditivoAtual || 'Previsão')}</span></td>
+          <td style="text-align: center;"><span class="badge ${prioridadeClass}">${prioridade}</span></td>
+          <td><small style="font-weight:600; color:var(--pmto-slate-600);">${escapeHTML(p.fiscal || 'PM7 / ATIT')}</small></td>
+          <td style="text-align: right;">
+            <div style="display: inline-flex; gap: 6px; align-items: center;">
+              <button class="btn btn-sm" onclick="converterPrevisaoEmContrato('${p.id}')" title="Converter em Contrato Real" style="background: #10B981; color: #FFF; padding: 3px 8px; font-size: 11px; font-weight:600;">
+                ✓ Converter
+              </button>
+              <button class="action-icon-btn" onclick="openPrevisaoModal('${p.id}')" title="Editar">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+              </button>
+              <button class="action-icon-btn btn-delete" onclick="confirmDeleteContract('${p.id}')" title="Excluir">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderPlanningTable() {
+      renderPlanningTab();
     }
 
     /* INICIALIZAÇÃO */
